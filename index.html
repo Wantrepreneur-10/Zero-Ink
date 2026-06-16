@@ -1,0 +1,1638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+  <meta name="description" content="Zero Ink — The world's first 4-digit digital receipt platform. No paper. No email. No friction.">
+  <meta name="theme-color" content="#00e5a0">
+  <meta property="og:title" content="Zero Ink — Receipts Reimagined">
+  <meta property="og:description" content="Shop with just a 4-digit code. Receipts arrive instantly. Ghost Mode, Refund Radar, Battles & more.">
+  <meta property="og:type" content="website">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Zero Ink">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="manifest" href="manifest.json">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zero Ink — Receipts Reimagined</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #07090d;
+  --s1: #0d1018;
+  --s2: #131720;
+  --s3: #191e2a;
+  --b1: #1d2535;
+  --b2: #263045;
+  --mint: #00e5a0;
+  --mint2: #00c98a;
+  --mglow: rgba(0,229,160,0.12);
+  --mdim: rgba(0,229,160,0.07);
+  --amber: #ffb830;
+  --blue: #4d9fff;
+  --red: #ff4d6a;
+  --purple: #a855f7;
+  --t1: #edf2fa;
+  --t2: #8892a8;
+  --t3: #4a5568;
+  --fd: 'Syne', sans-serif;
+  --fb: 'DM Sans', sans-serif;
+  --fm: 'DM Mono', monospace;
+  --r: 14px;
+  --rs: 10px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--t1);font-family:var(--fb);font-size:14px;line-height:1.6;overflow:hidden;height:100vh}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--b1);border-radius:2px}
+
+/* ══ LAYOUT ══ */
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* ══ SIDEBAR ══ */
+.sidebar{
+  width:64px;flex-shrink:0;
+  background:var(--s1);
+  border-right:1px solid var(--b1);
+  display:flex;flex-direction:column;align-items:center;
+  padding:16px 0;gap:2px;
+  position:relative;z-index:50;
+}
+.logo{
+  width:38px;height:38px;
+  background:var(--mint);border-radius:11px;
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:20px;cursor:pointer;flex-shrink:0;
+}
+.logo svg{width:20px;height:20px}
+.nav-btn{
+  width:42px;height:42px;border-radius:11px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--t3);
+  transition:all .18s;position:relative;border:1px solid transparent;
+}
+.nav-btn:hover{background:var(--s2);color:var(--t2)}
+.nav-btn.active{background:var(--mdim);border-color:var(--mglow);color:var(--mint)}
+.nav-btn svg{width:19px;height:19px}
+.nav-btn .tip{
+  position:absolute;left:52px;
+  background:var(--s2);border:1px solid var(--b1);
+  color:var(--t1);font-size:11px;padding:4px 9px;border-radius:7px;
+  white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s;z-index:200;
+}
+.nav-btn:hover .tip{opacity:1}
+.nav-sep{width:28px;height:1px;background:var(--b1);margin:6px 0}
+.sidebar-bot{margin-top:auto;display:flex;flex-direction:column;align-items:center;gap:8px}
+.user-ava{
+  width:34px;height:34px;border-radius:50%;
+  background:linear-gradient(135deg,var(--mint),var(--blue));
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--fd);font-weight:800;font-size:12px;color:var(--bg);
+  cursor:pointer;border:2px solid var(--b1);transition:border-color .2s;
+}
+.user-ava:hover{border-color:var(--mint)}
+
+/* ══ MAIN ══ */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+
+/* ══ TOPBAR ══ */
+.topbar{
+  height:54px;flex-shrink:0;
+  background:var(--s1);border-bottom:1px solid var(--b1);
+  display:flex;align-items:center;padding:0 20px;gap:12px;
+}
+.topbar-title{font-family:var(--fd);font-size:15px;font-weight:700;flex:1}
+.code-pill{
+  display:flex;align-items:center;gap:8px;
+  background:var(--mdim);border:1px solid var(--mglow);
+  border-radius:9px;padding:5px 12px;cursor:pointer;transition:all .2s;
+}
+.code-pill:hover{background:rgba(0,229,160,.14)}
+.code-pill-lbl{font-size:9px;color:var(--t3);font-family:var(--fm);text-transform:uppercase;letter-spacing:.08em}
+.code-pill-val{font-family:var(--fm);font-size:17px;font-weight:500;color:var(--mint);letter-spacing:.18em}
+.code-dot{width:6px;height:6px;background:var(--mint);border-radius:50%;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.ghost-chip{
+  display:flex;align-items:center;gap:6px;
+  padding:5px 11px;border-radius:9px;border:1px solid var(--b1);
+  cursor:pointer;transition:all .2s;font-size:12px;color:var(--t3);
+}
+.ghost-chip.on{background:rgba(168,85,247,.1);border-color:rgba(168,85,247,.3);color:var(--purple)}
+.ghost-chip svg{width:13px;height:13px}
+.icon-btn{
+  width:34px;height:34px;border-radius:9px;border:1px solid var(--b1);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--t2);transition:all .2s;position:relative;
+}
+.icon-btn:hover{background:var(--s2);color:var(--t1)}
+.icon-btn svg{width:17px;height:17px}
+.notif-badge{
+  position:absolute;top:5px;right:5px;width:7px;height:7px;
+  background:var(--red);border-radius:50%;border:1.5px solid var(--s1);
+}
+.mode-toggle{
+  display:flex;background:var(--s2);border:1px solid var(--b1);border-radius:9px;padding:3px;gap:2px;
+}
+.mode-btn{
+  padding:4px 12px;border-radius:7px;font-size:11px;font-weight:600;
+  cursor:pointer;transition:all .2s;color:var(--t3);font-family:var(--fd);
+  border:none;background:none;
+}
+.mode-btn.active{background:var(--mint);color:var(--bg)}
+
+/* ══ CONTENT ══ */
+.view{flex:1;overflow-y:auto;padding:20px;display:none}
+.view.active{display:block;animation:fadeup .2s ease}
+@keyframes fadeup{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ══ CARDS ══ */
+.card{background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);padding:18px}
+.card-sm{background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);padding:14px}
+.card:hover{border-color:var(--b2)}
+
+/* ══ GRID ══ */
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g2l{display:grid;grid-template-columns:1.5fr 1fr;gap:12px}
+.gc{display:flex;flex-direction:column;gap:12px}
+
+/* ══ STAT CARDS ══ */
+.stat-card{
+  background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);
+  padding:18px;position:relative;overflow:hidden;transition:all .2s;
+}
+.stat-card::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--accent,var(--mint));opacity:.7;
+}
+.stat-lbl{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;font-family:var(--fm);margin-bottom:6px}
+.stat-val{font-family:var(--fd);font-size:28px;font-weight:800;color:var(--t1);line-height:1}
+.stat-sub{font-size:11px;color:var(--t3);margin-top:5px}
+.up{color:var(--mint)}.down{color:var(--red)}
+
+/* ══ SECTION HEADS ══ */
+.sh{margin-bottom:16px}
+.sh-eye{font-family:var(--fm);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--mint);margin-bottom:4px}
+.sh-title{font-family:var(--fd);font-size:20px;font-weight:800;line-height:1.1}
+.sh-sub{font-size:12px;color:var(--t2);margin-top:5px}
+
+/* ══ DASHBOARD ══ */
+.spend-chart-wrap{
+  background:var(--s2);border-radius:10px;padding:14px;margin-top:14px;
+}
+.spend-bars{display:flex;align-items:flex-end;gap:5px;height:70px}
+.sbar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end}
+.sbar{
+  width:100%;border-radius:4px 4px 0 0;
+  background:var(--s3);transition:all .3s;cursor:pointer;
+}
+.sbar:hover{background:var(--mint)}
+.sbar.cur{background:var(--mdim);border:1px solid var(--mglow)}
+.sbar-lbl{font-size:9px;color:var(--t3);font-family:var(--fm)}
+
+.receipt-row{
+  display:flex;align-items:center;gap:11px;
+  padding:10px;border-radius:10px;cursor:pointer;
+  transition:all .15s;border:1px solid transparent;margin-bottom:3px;
+}
+.receipt-row:hover{background:var(--s2);border-color:var(--b1)}
+.receipt-row.alert{border-color:rgba(255,184,48,.2);background:rgba(255,184,48,.04)}
+.ricon{width:38px;height:38px;border-radius:10px;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.rinfo{flex:1;min-width:0}
+.rname{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rmeta{font-size:10px;color:var(--t3);display:flex;align-items:center;gap:6px;margin-top:2px}
+.rtag{padding:1px 6px;border-radius:4px;font-size:9px;font-family:var(--fm);letter-spacing:.03em}
+.tg{background:rgba(168,85,247,.12);color:var(--purple)}
+.ta{background:rgba(255,184,48,.12);color:var(--amber)}
+.tc{background:var(--mdim);color:var(--mint)}
+.ramount{font-family:var(--fd);font-size:14px;font-weight:700;text-align:right;white-space:nowrap}
+.rcarbon{display:block;font-size:9px;color:var(--mint);font-family:var(--fb);font-weight:400;text-align:right}
+
+/* ══ SCORE RING ══ */
+.score-wrap{display:flex;flex-direction:column;align-items:center;padding:8px 0}
+.score-ring-svg{transform:rotate(-90deg);width:130px;height:130px}
+.score-track{fill:none;stroke:var(--s3);stroke-width:9}
+.score-fill{fill:none;stroke-width:9;stroke-linecap:round;stroke-dasharray:345;stroke-dashoffset:86;transition:stroke-dashoffset 1.2s ease}
+.score-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.score-num{font-family:var(--fd);font-size:28px;font-weight:800;line-height:1}
+.score-lbl{font-size:9px;color:var(--t3);font-family:var(--fm);letter-spacing:.05em}
+.score-tier{margin-top:10px;padding:3px 11px;background:var(--mdim);border:1px solid var(--mglow);border-radius:20px;font-size:10px;color:var(--mint);font-family:var(--fm);letter-spacing:.05em}
+.score-bars{width:100%;margin-top:14px;display:flex;flex-direction:column;gap:7px}
+.sbar-row{display:flex;align-items:center;gap:8px}
+.sbar-label{font-size:10px;color:var(--t3);width:72px;flex-shrink:0}
+.sbar-track{flex:1;height:4px;background:var(--s2);border-radius:2px;overflow:hidden}
+.sbar-fill{height:100%;border-radius:2px;background:var(--mint)}
+.sbar-pct{font-size:10px;color:var(--t2);width:28px;text-align:right;font-family:var(--fm)}
+
+/* ══ GHOST MODE ══ */
+.ghost-panel{
+  background:linear-gradient(135deg,#0c0d1c,#12102a);
+  border:1px solid rgba(168,85,247,.2);border-radius:var(--r);padding:18px;
+  position:relative;overflow:hidden;
+}
+.ghost-panel::before{
+  content:'';position:absolute;top:-50px;right:-50px;
+  width:150px;height:150px;
+  background:radial-gradient(circle,rgba(168,85,247,.15),transparent 70%);
+  border-radius:50%;
+}
+.ghost-big-icon{font-size:36px;margin-bottom:8px}
+.ghost-stats-row{display:flex;gap:10px;margin-top:12px}
+.ghost-stat{
+  flex:1;background:rgba(168,85,247,.07);border:1px solid rgba(168,85,247,.15);
+  border-radius:9px;padding:10px;text-align:center;
+}
+.ghost-stat-val{font-family:var(--fd);font-size:18px;font-weight:800;color:var(--purple)}
+.ghost-stat-lbl{font-size:9px;color:var(--t3);margin-top:2px;font-family:var(--fm);text-transform:uppercase;letter-spacing:.05em}
+.ghost-toggle-big{
+  width:100%;padding:11px;margin-top:14px;
+  background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.3);
+  border-radius:10px;color:var(--purple);font-family:var(--fd);font-size:13px;font-weight:700;
+  cursor:pointer;transition:all .2s;
+}
+.ghost-toggle-big:hover{background:rgba(168,85,247,.25)}
+.ghost-toggle-big.active{background:var(--purple);color:#fff}
+.privacy-score{
+  display:flex;align-items:center;gap:10px;margin-top:12px;
+  background:rgba(168,85,247,.05);border:1px solid rgba(168,85,247,.1);
+  border-radius:9px;padding:10px;
+}
+.privacy-bar-track{flex:1;height:6px;background:var(--s2);border-radius:3px;overflow:hidden}
+.privacy-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--purple),#c084fc);width:92%}
+
+/* ══ RADAR ══ */
+.radar-card{
+  background:var(--s1);border:1px solid rgba(255,184,48,.2);
+  border-radius:var(--r);padding:14px;margin-bottom:10px;
+  cursor:pointer;transition:all .2s;position:relative;overflow:hidden;
+}
+.radar-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--amber)}
+.radar-card:hover{border-color:var(--amber);transform:translateX(2px)}
+.radar-top{display:flex;align-items:flex-start;gap:10px}
+.radar-icon{font-size:22px;flex-shrink:0}
+.radar-info{flex:1}
+.radar-merchant{font-weight:600;font-size:13px}
+.radar-item{font-size:11px;color:var(--t2);margin-top:2px}
+.radar-save{font-family:var(--fd);font-size:20px;font-weight:800;color:var(--amber);text-align:right;white-space:nowrap}
+.radar-save span{display:block;font-size:10px;font-family:var(--fb);font-weight:400;color:var(--t3);text-align:right}
+.radar-script{
+  margin-top:10px;background:var(--s2);border:1px solid var(--b1);
+  border-radius:8px;padding:10px;font-size:11px;color:var(--t2);
+  line-height:1.55;font-style:italic;display:none;
+}
+.radar-card.open .radar-script{display:block}
+.radar-btn{
+  width:100%;margin-top:8px;padding:9px;
+  background:var(--amber);border:none;border-radius:9px;
+  color:var(--bg);font-size:12px;font-weight:700;font-family:var(--fd);
+  cursor:pointer;display:none;transition:opacity .2s;
+}
+.radar-card.open .radar-btn{display:block}
+.radar-btn:hover{opacity:.88}
+.radar-empty{
+  text-align:center;padding:36px 20px;color:var(--t3);
+}
+.radar-scan-anim{
+  width:80px;height:80px;border-radius:50%;
+  border:2px solid var(--amber);margin:0 auto 12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:32px;position:relative;
+  animation:radarPulse 2s infinite;
+}
+@keyframes radarPulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(255,184,48,.3)}
+  50%{box-shadow:0 0 0 16px rgba(255,184,48,0)}
+}
+
+/* ══ BATTLES ══ */
+.battle-card{
+  background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);
+  padding:16px;margin-bottom:10px;cursor:pointer;transition:all .2s;
+  position:relative;overflow:hidden;
+}
+.battle-card:hover{border-color:var(--b2);transform:translateY(-1px)}
+.battle-stripe{
+  position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--mint),var(--blue));
+  transform:scaleX(0);transform-origin:left;transition:transform .3s;
+}
+.battle-card:hover .battle-stripe{transform:scaleX(1)}
+.battle-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.battle-name{font-family:var(--fd);font-size:14px;font-weight:700}
+.battle-badge{padding:3px 8px;border-radius:6px;font-size:9px;font-family:var(--fm);letter-spacing:.05em}
+.b-live{background:rgba(255,77,106,.12);color:var(--red);border:1px solid rgba(255,77,106,.25)}
+.b-win{background:var(--mdim);color:var(--mint);border:1px solid var(--mglow)}
+.b-pend{background:rgba(255,184,48,.1);color:var(--amber);border:1px solid rgba(255,184,48,.25)}
+.battle-vs{display:flex;align-items:center;gap:8px}
+.bplayer{flex:1;text-align:center}
+.bplayer-name{font-size:10px;color:var(--t3);margin-bottom:3px}
+.bplayer-amt{font-family:var(--fd);font-size:20px;font-weight:800}
+.bplayer-amt.you{color:var(--mint)}.bplayer-amt.them{color:var(--t2)}
+.bvs{font-size:9px;color:var(--t3);font-family:var(--fm)}
+.battle-track{height:6px;background:var(--s2);border-radius:3px;margin-top:10px;overflow:hidden}
+.battle-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--mint),var(--blue));transition:width 1.2s ease}
+.battle-days{font-size:10px;color:var(--t3);margin-top:5px;font-family:var(--fm)}
+.new-battle-btn{
+  width:100%;padding:13px;background:var(--mdim);border:1px dashed var(--mglow);
+  border-radius:var(--r);color:var(--mint);font-family:var(--fd);font-size:13px;
+  font-weight:700;cursor:pointer;transition:all .2s;margin-top:4px;
+}
+.new-battle-btn:hover{background:rgba(0,229,160,.14)}
+
+/* ══ CAPSULE ══ */
+.capsule-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px}
+.capsule-card{
+  background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);
+  padding:16px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;
+}
+.capsule-card:hover{border-color:var(--blue)}
+.capsule-card::after{
+  content:'';position:absolute;bottom:-30px;right:-30px;
+  width:90px;height:90px;
+  background:radial-gradient(circle,rgba(77,159,255,.1),transparent 70%);
+  border-radius:50%;
+}
+.cap-lock{font-size:26px;margin-bottom:8px}
+.cap-name{font-family:var(--fd);font-size:13px;font-weight:700;margin-bottom:3px}
+.cap-date{font-size:10px;color:var(--t3);font-family:var(--fm)}
+.cap-amt{font-family:var(--fd);font-size:20px;font-weight:800;color:var(--blue);margin-top:8px}
+.cap-inflation{font-size:10px;color:var(--t3);margin-top:3px}
+.cap-inflation .hi{color:var(--red);font-weight:600}
+.cap-countdown{display:flex;gap:6px;margin-top:8px}
+.ctu{text-align:center;background:var(--s2);border-radius:7px;padding:5px 8px}
+.ctn{font-family:var(--fd);font-size:16px;font-weight:800;color:var(--blue);line-height:1}
+.ctl{font-size:8px;color:var(--t3);font-family:var(--fm);text-transform:uppercase;letter-spacing:.04em}
+.new-capsule{
+  width:100%;padding:13px;background:rgba(77,159,255,.07);
+  border:1px dashed rgba(77,159,255,.3);border-radius:var(--r);
+  color:var(--blue);font-family:var(--fd);font-size:13px;font-weight:700;
+  cursor:pointer;transition:all .2s;
+}
+.new-capsule:hover{background:rgba(77,159,255,.13)}
+
+/* ══ CARBON ══ */
+.carbon-big{
+  display:flex;align-items:center;gap:16px;padding:18px;
+  background:var(--s2);border-radius:12px;margin-bottom:14px;
+}
+.carbon-icon{font-size:36px}
+.carbon-info{flex:1}
+.carbon-month{font-size:11px;color:var(--t3);margin-bottom:3px}
+.carbon-kg{font-family:var(--fd);font-size:26px;font-weight:800;color:var(--mint)}
+.carbon-compare{font-size:11px;color:var(--t3);margin-top:2px}
+.carbon-compare .better{color:var(--mint)}.carbon-compare .worse{color:var(--red)}
+.carbon-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px;border-radius:10px;border:1px solid var(--b1);margin-bottom:6px;
+  transition:all .2s;cursor:pointer;
+}
+.carbon-item:hover{background:var(--s2)}
+.ci-icon{font-size:18px;flex-shrink:0}
+.ci-info{flex:1}
+.ci-name{font-size:12px;font-weight:500}
+.ci-detail{font-size:10px;color:var(--t3);margin-top:1px}
+.ci-bar{flex:1;height:4px;background:var(--s2);border-radius:2px;overflow:hidden;max-width:80px}
+.ci-fill{height:100%;border-radius:2px}
+.ci-kg{font-size:12px;color:var(--mint);font-family:var(--fm);white-space:nowrap}
+
+/* ══ MERCHANT ══ */
+.pos-wrap{max-width:400px;margin:0 auto}
+.pos-terminal{
+  background:var(--s1);border:1px solid var(--b1);border-radius:18px;
+  padding:24px;text-align:center;
+}
+.pos-store{font-family:var(--fd);font-size:18px;font-weight:800;margin-bottom:3px}
+.pos-sub-lbl{font-size:11px;color:var(--t3);margin-bottom:16px}
+.pos-total{font-family:var(--fd);font-size:38px;font-weight:800;color:var(--mint);margin:12px 0 6px}
+.pos-items{background:var(--s2);border-radius:10px;padding:10px;margin-bottom:18px;text-align:left}
+.pos-item-row{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;color:var(--t2);border-bottom:1px solid var(--b1)}
+.pos-item-row:last-child{border:none}
+.pos-prompt{font-size:13px;color:var(--t2);margin-bottom:14px}
+.pos-code-input{display:flex;gap:8px;justify-content:center;margin-bottom:18px}
+.pos-digit{
+  width:50px;height:58px;border-radius:11px;border:2px solid var(--b2);
+  background:var(--s2);font-family:var(--fd);font-size:26px;font-weight:800;
+  color:var(--mint);text-align:center;outline:none;transition:border-color .2s;caret-color:var(--mint);
+}
+.pos-digit:focus{border-color:var(--mint)}
+.pos-digit.filled{border-color:var(--mglow);background:var(--mdim)}
+.pos-keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:14px}
+.pk{
+  padding:13px;background:var(--s2);border:1px solid var(--b1);border-radius:9px;
+  font-family:var(--fd);font-size:17px;font-weight:700;cursor:pointer;
+  transition:all .12s;text-align:center;color:var(--t1);
+}
+.pk:hover{background:var(--s3);border-color:var(--b2)}
+.pk:active{transform:scale(.95)}
+.pk.clr{color:var(--red)}.pk.bk{color:var(--amber)}
+.pos-send-btn{
+  width:100%;padding:13px;background:var(--mint);color:var(--bg);border:none;
+  border-radius:11px;font-family:var(--fd);font-size:14px;font-weight:800;
+  cursor:pointer;transition:all .2s;letter-spacing:.01em;
+}
+.pos-send-btn:hover:not(:disabled){opacity:.88;transform:translateY(-1px)}
+.pos-send-btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
+.pos-success{display:none;padding:16px 0}
+.pos-success.show{display:block}
+.pos-suc-icon{font-size:44px;margin-bottom:10px;animation:pop .4s ease}
+@keyframes pop{0%{transform:scale(0)}80%{transform:scale(1.12)}100%{transform:scale(1)}}
+.pos-suc-title{font-family:var(--fd);font-size:18px;font-weight:800;color:var(--mint)}
+.pos-suc-sub{font-size:12px;color:var(--t2);margin-top:5px}
+.merchant-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.mstat{background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);padding:14px;text-align:center}
+.mstat-val{font-family:var(--fd);font-size:24px;font-weight:800;color:var(--mint)}
+.mstat-lbl{font-size:10px;color:var(--t3);margin-top:3px}
+.merchant-row{
+  display:flex;align-items:center;gap:10px;padding:10px;
+  border-radius:10px;border:1px solid var(--b1);margin-bottom:6px;
+  transition:all .2s;cursor:pointer;
+}
+.merchant-row:hover{background:var(--s2)}
+.merchant-code{
+  font-family:var(--fm);font-size:18px;font-weight:500;color:var(--mint);
+  background:var(--mdim);border:1px solid var(--mglow);border-radius:7px;
+  padding:4px 10px;
+}
+.merchant-time{font-size:10px;color:var(--t3);font-family:var(--fm)}
+.merchant-amt{font-family:var(--fd);font-size:16px;font-weight:700;color:var(--t1);text-align:right}
+
+/* ══ SETTINGS ══ */
+.settings-section{margin-bottom:22px}
+.settings-title{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);font-family:var(--fm);margin-bottom:8px}
+.settings-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 14px;background:var(--s1);border:1px solid var(--b1);border-radius:11px;
+  margin-bottom:4px;transition:border-color .2s;cursor:pointer;
+}
+.settings-row:hover{border-color:var(--b2)}
+.sr-left{display:flex;align-items:center;gap:11px}
+.sr-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.sr-name{font-size:13px;font-weight:500}
+.sr-sub{font-size:10px;color:var(--t3);margin-top:1px}
+.toggle{
+  width:38px;height:22px;background:var(--s2);border:1px solid var(--b2);
+  border-radius:11px;position:relative;cursor:pointer;transition:all .2s;flex-shrink:0;
+}
+.toggle.on{background:var(--mint);border-color:var(--mint)}
+.toggle::after{
+  content:'';position:absolute;top:2px;left:2px;
+  width:16px;height:16px;background:var(--t3);border-radius:50%;transition:all .2s;
+}
+.toggle.on::after{left:18px;background:var(--bg)}
+
+/* ══ TOAST ══ */
+.toast{
+  position:fixed;bottom:20px;right:20px;
+  background:var(--s1);border:1px solid var(--mglow);border-radius:14px;
+  padding:14px 18px;width:290px;z-index:9999;
+  transform:translateY(100px);opacity:0;
+  transition:all .4s cubic-bezier(.175,.885,.32,1.275);
+  box-shadow:0 20px 50px rgba(0,0,0,.5),0 0 0 1px var(--mglow);
+}
+.toast.show{transform:translateY(0);opacity:1}
+.toast-head{display:flex;align-items:center;gap:7px;margin-bottom:8px}
+.toast-dot{width:7px;height:7px;background:var(--mint);border-radius:50%;animation:blink 1s infinite}
+.toast-title{font-family:var(--fd);font-size:12px;font-weight:700;color:var(--mint)}
+.toast-store{font-size:13px;font-weight:600}
+.toast-amt{font-family:var(--fd);font-size:20px;font-weight:800}
+.toast-items-lbl{font-size:10px;color:var(--t3);margin-top:3px}
+.toast-carbon{display:flex;align-items:center;gap:5px;margin-top:7px;font-size:10px;color:var(--mint)}
+
+/* ══ PANEL HEADER ══ */
+.ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.ph-title{font-family:var(--fd);font-size:14px;font-weight:700}
+.ph-action{font-size:11px;color:var(--mint);cursor:pointer;opacity:.8;transition:opacity .2s}
+.ph-action:hover{opacity:1}
+
+/* ══ UTILITY ══ */
+.row{display:flex;align-items:center;gap:8px}
+.row-between{display:flex;align-items:center;justify-content:space-between}
+.divider{height:1px;background:var(--b1);margin:14px 0}
+.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}
+.mb12{margin-bottom:12px}
+.btn{padding:8px 14px;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:var(--fb);transition:all .2s}
+.btn-mint{background:var(--mint);color:var(--bg)}.btn-mint:hover{opacity:.88}
+.btn-out{background:transparent;color:var(--t2);border:1px solid var(--b2)}.btn-out:hover{border-color:var(--mint);color:var(--mint)}
+label{display:block;font-size:10px;color:var(--t3);margin-bottom:5px;font-family:var(--fm);text-transform:uppercase;letter-spacing:.06em}
+input,select{background:var(--s2);border:1px solid var(--b2);border-radius:9px;color:var(--t1);padding:9px 13px;font-family:var(--fb);font-size:13px;outline:none;width:100%;transition:border-color .2s}
+input:focus,select:focus{border-color:var(--mint)}
+select option{background:var(--s2)}
+.fg{margin-bottom:12px}
+.chip{
+  display:inline-flex;align-items:center;gap:4px;padding:3px 9px;
+  border-radius:6px;font-size:10px;font-family:var(--fm);
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="logo" onclick="setView('dashboard')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#07090d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
+      <rect x="9" y="3" width="6" height="4" rx="1"/>
+      <path d="M9 12h6M9 16h4"/>
+    </svg>
+  </div>
+
+  <div class="nav-btn active" id="nb-dashboard" onclick="setView('dashboard')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+    <div class="tip">Dashboard</div>
+  </div>
+
+  <div class="nav-btn" id="nb-receipts" onclick="setView('receipts')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
+    <div class="tip">My Receipts</div>
+  </div>
+
+  <div class="nav-btn" id="nb-ghost" onclick="setView('ghost')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 10h.01M15 10h.01M12 2a8 8 0 018 8v10l-4-4-4 4-4-4-4 4V10a8 8 0 018-8z"/></svg>
+    <div class="tip">Ghost Mode</div>
+  </div>
+
+  <div class="nav-btn" id="nb-radar" onclick="setView('radar')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 010 8.49m-8.48-.01a6 6 0 010-8.49m11.31-2.82a10 10 0 010 14.14m-14.14 0a10 10 0 010-14.14"/></svg>
+    <div class="tip">Refund Radar</div>
+  </div>
+
+  <div class="nav-btn" id="nb-battles" onclick="setView('battles')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+    <div class="tip">Receipt Battles</div>
+  </div>
+
+  <div class="nav-btn" id="nb-capsule" onclick="setView('capsule')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+    <div class="tip">Time Capsule</div>
+  </div>
+
+  <div class="nav-btn" id="nb-carbon" onclick="setView('carbon')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 22V12M12 12C12 6.477 7.523 2 2 2c0 5.523 4.477 10 10 10zM12 12c0-5.523 4.477-10 10-10-5.523 0-10 4.477-10 10z"/></svg>
+    <div class="tip">Carbon Tracker</div>
+  </div>
+
+  <div class="nav-sep"></div>
+
+  <div class="nav-btn" id="nb-merchant" onclick="setView('merchant')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+    <div class="tip">Merchant Portal</div>
+  </div>
+
+  <div class="sidebar-bot">
+    <div class="nav-btn" id="nb-settings" onclick="setView('settings')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      <div class="tip">Settings</div>
+    </div>
+    <div class="user-ava" onclick="setView('settings')">VS</div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-title" id="topbar-title">Dashboard</div>
+    <div class="mode-toggle">
+      <button class="mode-btn active" onclick="switchMode('customer',this)">Customer</button>
+      <button class="mode-btn" onclick="switchMode('merchant',this)">Merchant</button>
+    </div>
+    <div class="code-pill" onclick="copyCode()">
+      <div>
+        <div class="code-pill-lbl">Your Code</div>
+        <div class="code-pill-val">7 4 2 9</div>
+      </div>
+      <div class="code-dot"></div>
+    </div>
+    <div class="ghost-chip" id="ghost-chip" onclick="toggleGhost()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 10h.01M15 10h.01M12 2a8 8 0 018 8v10l-4-4-4 4-4-4-4 4V10a8 8 0 018-8z"/></svg>
+      <span id="ghost-label">Ghost Off</span>
+    </div>
+    <div class="icon-btn" onclick="toggleNotifs()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+      <div class="notif-badge"></div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="view active" id="view-dashboard">
+    <div class="sh"><div class="sh-eye">Overview</div><div class="sh-title">Good morning, Vamsi 👋</div><div class="sh-sub">Here's your financial picture at a glance.</div></div>
+
+    <div class="g3 mb12">
+      <div class="stat-card" style="--accent:var(--mint)">
+        <div class="stat-lbl">This Month</div>
+        <div class="stat-val">$841</div>
+        <div class="stat-sub"><span class="down">↑ $63</span> vs last month</div>
+      </div>
+      <div class="stat-card" style="--accent:var(--amber)">
+        <div class="stat-lbl">Refunds Saved</div>
+        <div class="stat-val">$127</div>
+        <div class="stat-sub"><span class="up">3 alerts</span> this month</div>
+      </div>
+      <div class="stat-card" style="--accent:var(--purple)">
+        <div class="stat-lbl">Zero Ink Score</div>
+        <div class="stat-val">750</div>
+        <div class="stat-sub"><span class="up">↑ 18pts</span> this month · Smart Spender</div>
+      </div>
+    </div>
+
+    <div class="g2l">
+      <!-- Recent Receipts -->
+      <div class="card">
+        <div class="ph"><div class="ph-title">Recent Receipts</div><span class="ph-action" onclick="setView('receipts')">View all →</span></div>
+        <div id="dash-receipts"></div>
+      </div>
+
+      <!-- Score + Chart -->
+      <div class="gc">
+        <div class="card">
+          <div class="ph"><div class="ph-title">Zero Ink Score</div><span class="ph-action" onclick="setView('settings')">Details →</span></div>
+          <div class="score-wrap">
+            <div style="position:relative;width:130px;height:130px">
+              <svg class="score-ring-svg" viewBox="0 0 130 130">
+                <defs>
+                  <linearGradient id="sg" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#00e5a0"/>
+                    <stop offset="100%" stop-color="#4d9fff"/>
+                  </linearGradient>
+                </defs>
+                <circle class="score-track" cx="65" cy="65" r="55"/>
+                <circle class="score-fill" cx="65" cy="65" r="55" stroke="url(#sg)"/>
+              </svg>
+              <div class="score-center">
+                <div class="score-num">750</div>
+                <div class="score-lbl">/ 1000</div>
+              </div>
+            </div>
+            <div class="score-tier">Smart Spender</div>
+            <div class="score-bars">
+              <div class="sbar-row"><div class="sbar-label">Consistency</div><div class="sbar-track"><div class="sbar-fill" style="width:88%"></div></div><div class="sbar-pct">88</div></div>
+              <div class="sbar-row"><div class="sbar-label">Savings</div><div class="sbar-track"><div class="sbar-fill" style="width:72%"></div></div><div class="sbar-pct">72</div></div>
+              <div class="sbar-row"><div class="sbar-label">Ghost Use</div><div class="sbar-track"><div class="sbar-fill" style="width:65%;background:var(--purple)"></div></div><div class="sbar-pct">65</div></div>
+              <div class="sbar-row"><div class="sbar-label">Carbon</div><div class="sbar-track"><div class="sbar-fill" style="width:80%"></div></div><div class="sbar-pct">80</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="ph"><div class="ph-title">Spending Trend</div></div>
+          <div class="spend-chart-wrap">
+            <div class="spend-bars" id="spend-chart"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECEIPTS -->
+  <div class="view" id="view-receipts">
+    <div class="sh"><div class="sh-eye">Receipt Vault</div><div class="sh-title">All Your Receipts</div><div class="sh-sub">Every purchase, forever organized. No paper needed.</div></div>
+    <div class="row mb12">
+      <input type="text" placeholder="🔍  Search receipts..." style="max-width:280px" oninput="filterReceipts(this.value)">
+      <select style="max-width:160px" onchange="filterReceipts(null,this.value)">
+        <option value="">All Categories</option>
+        <option>Food & Drink</option><option>Shopping</option><option>Health</option><option>Transport</option><option>Entertainment</option>
+      </select>
+    </div>
+    <div id="all-receipts"></div>
+  </div>
+
+  <!-- GHOST MODE -->
+  <div class="view" id="view-ghost">
+    <div class="sh"><div class="sh-eye">Privacy Shield</div><div class="sh-title">Ghost Mode 👻</div><div class="sh-sub">Shop completely anonymously. Merchants only see your 4-digit code — never your name, email, or identity.</div></div>
+    <div class="g2l">
+      <div class="gc">
+        <div class="ghost-panel">
+          <div class="ghost-big-icon">👻</div>
+          <div style="font-family:var(--fd);font-size:16px;font-weight:700;margin-bottom:4px">Anonymous Shopping</div>
+          <div style="font-size:12px;color:var(--t2)">When Ghost Mode is active, your purchases are completely unlinkable to your identity. Zero merchants can build a profile on you.</div>
+          <div class="ghost-stats-row">
+            <div class="ghost-stat"><div class="ghost-stat-val">23</div><div class="ghost-stat-lbl">Ghost Receipts</div></div>
+            <div class="ghost-stat"><div class="ghost-stat-val">0</div><div class="ghost-stat-lbl">Data Leaks</div></div>
+            <div class="ghost-stat"><div class="ghost-stat-val">92%</div><div class="ghost-stat-lbl">Privacy Score</div></div>
+          </div>
+          <button class="ghost-toggle-big" id="ghost-big-btn" onclick="toggleGhost()">🔐 Enable Ghost Mode</button>
+        </div>
+
+        <div class="card">
+          <div class="ph"><div class="ph-title">Privacy Score</div></div>
+          <div class="privacy-score">
+            <span style="font-size:20px">🛡️</span>
+            <div style="flex:1">
+              <div style="font-size:11px;color:var(--t2);margin-bottom:6px">Your identity protection level</div>
+              <div class="privacy-bar-track"><div class="privacy-bar-fill"></div></div>
+            </div>
+            <div style="font-family:var(--fd);font-size:18px;font-weight:800;color:var(--purple)">92%</div>
+          </div>
+          <div class="divider"></div>
+          <div style="font-size:12px;color:var(--t2);line-height:1.6">
+            <div style="margin-bottom:6px">✅ No email shared with any merchant</div>
+            <div style="margin-bottom:6px">✅ No phone number linked to purchases</div>
+            <div style="margin-bottom:6px">✅ 23 receipts collected anonymously</div>
+            <div style="color:var(--amber)">⚠️ 2 receipts used real identity (pre-Ghost)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="gc">
+        <div class="card">
+          <div class="ph"><div class="ph-title">How It Works</div></div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;gap:10px;align-items:flex-start">
+              <div style="width:26px;height:26px;background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.3);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--purple);flex-shrink:0;font-family:var(--fd)">1</div>
+              <div><div style="font-size:12px;font-weight:600;margin-bottom:2px">Enable Ghost Mode</div><div style="font-size:11px;color:var(--t3)">Activate before shopping. Your code stays the same.</div></div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start">
+              <div style="width:26px;height:26px;background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.3);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--purple);flex-shrink:0;font-family:var(--fd)">2</div>
+              <div><div style="font-size:12px;font-weight:600;margin-bottom:2px">Enter your code at checkout</div><div style="font-size:11px;color:var(--t3)">The merchant only sees "7429". Nothing else.</div></div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start">
+              <div style="width:26px;height:26px;background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.3);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--purple);flex-shrink:0;font-family:var(--fd)">3</div>
+              <div><div style="font-size:12px;font-weight:600;margin-bottom:2px">Receipt arrives privately</div><div style="font-size:11px;color:var(--t3)">Your receipt appears in app. Zero data sharing.</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="ph"><div class="ph-title">Ghost Receipts</div></div>
+          <div id="ghost-receipts-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REFUND RADAR -->
+  <div class="view" id="view-radar">
+    <div class="sh"><div class="sh-eye">AI Price Intelligence</div><div class="sh-title">Refund Radar 📡</div><div class="sh-sub">Our AI scans your purchases daily for price drops. When prices fall after you buy, we alert you with the exact script to claim your refund.</div></div>
+    <div class="g2l">
+      <div>
+        <div class="g3 mb12" style="grid-template-columns:1fr 1fr 1fr">
+          <div class="card-sm" style="text-align:center">
+            <div style="font-family:var(--fd);font-size:22px;font-weight:800;color:var(--amber)">$127</div>
+            <div style="font-size:10px;color:var(--t3);margin-top:2px">Saved This Month</div>
+          </div>
+          <div class="card-sm" style="text-align:center">
+            <div style="font-family:var(--fd);font-size:22px;font-weight:800;color:var(--mint)">3</div>
+            <div style="font-size:10px;color:var(--t3);margin-top:2px">Active Alerts</div>
+          </div>
+          <div class="card-sm" style="text-align:center">
+            <div style="font-family:var(--fd);font-size:22px;font-weight:800;color:var(--blue)">14</div>
+            <div style="font-size:10px;color:var(--t3);margin-top:2px">Days Monitored</div>
+          </div>
+        </div>
+        <div id="radar-alerts"></div>
+      </div>
+      <div class="gc">
+        <div class="card">
+          <div class="ph"><div class="ph-title">How Radar Works</div></div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;gap:10px;align-items:flex-start">
+              <span style="font-size:20px">🧾</span>
+              <div><div style="font-size:12px;font-weight:600">Every receipt scanned</div><div style="font-size:11px;color:var(--t3);margin-top:2px">AI extracts item names, prices, and store info instantly.</div></div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start">
+              <span style="font-size:20px">📊</span>
+              <div><div style="font-size:12px;font-weight:600">Prices monitored daily</div><div style="font-size:11px;color:var(--t3);margin-top:2px">We check the same item's price at the same store every 24 hours.</div></div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start">
+              <span style="font-size:20px">⚡</span>
+              <div><div style="font-size:12px;font-weight:600">Instant alert + script</div><div style="font-size:11px;color:var(--t3);margin-top:2px">The moment a drop is found, you get the exact words to say at the store.</div></div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start">
+              <span style="font-size:20px">💰</span>
+              <div><div style="font-size:12px;font-weight:600">You claim your money</div><div style="font-size:11px;color:var(--t3);margin-top:2px">Most stores honor price matching within 14–30 days of purchase.</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ph"><div class="ph-title">Price Match Policies</div></div>
+          <div style="font-size:12px;display:flex;flex-direction:column;gap:8px">
+            <div class="row-between" style="padding:7px;background:var(--s2);border-radius:8px">
+              <span>🏪 Target</span><span style="color:var(--mint)">14 days</span>
+            </div>
+            <div class="row-between" style="padding:7px;background:var(--s2);border-radius:8px">
+              <span>🛒 Walmart</span><span style="color:var(--mint)">7 days</span>
+            </div>
+            <div class="row-between" style="padding:7px;background:var(--s2);border-radius:8px">
+              <span>🔵 Best Buy</span><span style="color:var(--mint)">15 days</span>
+            </div>
+            <div class="row-between" style="padding:7px;background:var(--s2);border-radius:8px">
+              <span>📦 Amazon</span><span style="color:var(--amber)">30 days</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BATTLES -->
+  <div class="view" id="view-battles">
+    <div class="sh"><div class="sh-eye">Social Spending</div><div class="sh-title">Receipt Battles ⚔️</div><div class="sh-sub">Challenge friends on real spending. Who can spend less on food this month? Powered by real receipt data — no self-reporting.</div></div>
+    <div class="g2l">
+      <div>
+        <div id="battles-list"></div>
+        <button class="new-battle-btn" onclick="showNewBattle()">⚔️ Challenge Someone New</button>
+      </div>
+      <div class="gc">
+        <div class="card">
+          <div class="ph"><div class="ph-title">Your Battle Stats</div></div>
+          <div class="g2" style="gap:8px">
+            <div style="text-align:center;background:var(--s2);border-radius:10px;padding:12px">
+              <div style="font-family:var(--fd);font-size:22px;font-weight:800;color:var(--mint)">7</div>
+              <div style="font-size:10px;color:var(--t3);margin-top:3px">Battles Won</div>
+            </div>
+            <div style="text-align:center;background:var(--s2);border-radius:10px;padding:12px">
+              <div style="font-family:var(--fd);font-size:22px;font-weight:800;color:var(--red)">3</div>
+              <div style="font-size:10px;color:var(--t3);margin-top:3px">Battles Lost</div>
+            </div>
+            <div style="text-align:center;background:var(--s2);border-radius:10px;padding:12px">
+              <div style="font-family:var(--fd);font-size:22px;font-weight:800;color:var(--amber)">$214</div>
+              <div style="font-size:10px;color:var(--t3);margin-top:3px">Saved Battling</div>
+            </div>
+            <div style="text-align:center;background:var(--s2);border-radius:10px;padding:12px">
+              <div style="font-family:var(--fd);font-size:22px;font-weight:800;color:var(--blue)">70%</div>
+              <div style="font-size:10px;color:var(--t3);margin-top:3px">Win Rate</div>
+            </div>
+          </div>
+        </div>
+        <div class="card" id="new-battle-form" style="display:none">
+          <div class="ph"><div class="ph-title">New Challenge</div></div>
+          <div class="fg"><label>Friend's Zero Ink Code</label><input type="text" placeholder="e.g. 8831" maxlength="4" style="font-family:var(--fm);font-size:20px;letter-spacing:.2em;text-align:center"></div>
+          <div class="fg"><label>Battle Category</label>
+            <select>
+              <option>🍔 Food & Dining</option><option>🛒 Groceries</option>
+              <option>☕ Coffee</option><option>🎮 Entertainment</option><option>👗 Shopping</option>
+            </select>
+          </div>
+          <div class="fg"><label>Duration</label>
+            <select><option>7 days</option><option>14 days</option><option>30 days</option></select>
+          </div>
+          <button class="btn btn-mint" style="width:100%;padding:11px;font-size:13px" onclick="startBattle()">Send Challenge ⚔️</button>
+        </div>
+        <div class="card">
+          <div class="ph"><div class="ph-title">Battle Rules</div></div>
+          <div style="font-size:12px;color:var(--t2);line-height:1.7">
+            <div>📊 Spending tracked from <strong>real receipts</strong> only</div>
+            <div>🔒 Both players must agree before start</div>
+            <div>🎯 Winner is lowest spender in category</div>
+            <div>🏆 Results posted to your profile</div>
+            <div>❌ No manual entries — only receipt data</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIME CAPSULE -->
+  <div class="view" id="view-capsule">
+    <div class="sh"><div class="sh-eye">Financial Time Travel</div><div class="sh-title">Time Capsule ⏳</div><div class="sh-sub">Lock any receipt today. Open it 1 year from now and see exactly how inflation hit your real purchases — not some index, your actual life.</div></div>
+    <div class="g2l">
+      <div>
+        <div class="capsule-grid" id="capsule-grid"></div>
+        <div class="card mt12">
+          <div class="ph"><div class="ph-title">Lock a New Receipt</div></div>
+          <div class="fg"><label>Select Receipt</label>
+            <select id="capsule-receipt-select">
+              <option>🍔 Burger Republic — $18.75 (Today)</option>
+              <option>☕ Blue Stone Coffee — $7.40 (Today)</option>
+              <option>🛒 Fresh Market — $52.30 (Yesterday)</option>
+              <option>💊 Walgreens — $34.80 (2 days ago)</option>
+            </select>
+          </div>
+          <div class="fg"><label>Unlock Date</label>
+            <input type="date" id="capsule-date" min="2026-03-18">
+          </div>
+          <div class="fg"><label>Note to Future Self</label>
+            <input type="text" placeholder="e.g. Remember when gas was this cheap?">
+          </div>
+          <button class="new-capsule" onclick="createCapsule()">🔐 Lock This Receipt</button>
+        </div>
+      </div>
+      <div class="gc">
+        <div class="card">
+          <div class="ph"><div class="ph-title">Why Time Capsules?</div></div>
+          <div style="font-size:12px;color:var(--t2);line-height:1.7">
+            <p style="margin-bottom:10px">Inflation is invisible until it hits your wallet. Time Capsules make it real.</p>
+            <p style="margin-bottom:10px">Lock a grocery receipt today. In 12 months, you'll see the exact same items cost 8–15% more.</p>
+            <p>This is the only app that shows inflation through <strong style="color:var(--t1)">your own spending</strong>, not government statistics.</p>
+          </div>
+          <div class="divider"></div>
+          <div style="background:var(--s2);border-radius:10px;padding:12px">
+            <div style="font-size:10px;color:var(--t3);margin-bottom:6px;font-family:var(--fm);text-transform:uppercase;letter-spacing:.06em">Inflation Stats (US, 2025)</div>
+            <div class="row-between" style="font-size:12px;margin-bottom:5px"><span style="color:var(--t2)">Groceries</span><span style="color:var(--red)">+6.2%</span></div>
+            <div class="row-between" style="font-size:12px;margin-bottom:5px"><span style="color:var(--t2)">Dining Out</span><span style="color:var(--red)">+8.1%</span></div>
+            <div class="row-between" style="font-size:12px;margin-bottom:5px"><span style="color:var(--t2)">Healthcare</span><span style="color:var(--red)">+4.7%</span></div>
+            <div class="row-between" style="font-size:12px"><span style="color:var(--t2)">Gas</span><span style="color:var(--amber)">+2.3%</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ph"><div class="ph-title">Already Unlocked</div></div>
+          <div style="padding:8px;background:var(--s2);border-radius:10px;border-left:3px solid var(--mint)">
+            <div style="font-size:11px;color:var(--t3);margin-bottom:4px;font-family:var(--fm)">MARCH 2025 → MARCH 2026</div>
+            <div style="font-size:12px;font-weight:600;margin-bottom:4px">🛒 Whole Foods Haul</div>
+            <div style="display:flex;justify-content:space-between;font-size:12px">
+              <span style="color:var(--t2)">Locked at: <strong style="color:var(--t1)">$94.20</strong></span>
+              <span style="color:var(--red)">Same cart today: <strong>$106.80</strong></span>
+            </div>
+            <div style="font-size:11px;color:var(--red);margin-top:4px">📈 +13.4% inflation on your actual cart</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARBON -->
+  <div class="view" id="view-carbon">
+    <div class="sh"><div class="sh-eye">Environmental Impact</div><div class="sh-title">Carbon Per Receipt 🌱</div><div class="sh-sub">Every purchase has a carbon footprint. We calculate yours from your actual receipts and show you how to reduce it.</div></div>
+    <div class="g2l">
+      <div>
+        <div class="carbon-big">
+          <div class="carbon-icon">🌍</div>
+          <div class="carbon-info">
+            <div class="carbon-month">This Month's Carbon Footprint</div>
+            <div class="carbon-kg">48.2 kg CO₂</div>
+            <div class="carbon-compare"><span class="better">↓ 12% better</span> than avg Zero Ink user</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-family:var(--fd);font-size:13px;font-weight:700;color:var(--mint)">Grade</div>
+            <div style="font-family:var(--fd);font-size:36px;font-weight:800;color:var(--mint)">B+</div>
+          </div>
+        </div>
+        <div id="carbon-list"></div>
+      </div>
+      <div class="gc">
+        <div class="card">
+          <div class="ph"><div class="ph-title">Monthly Comparison</div></div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div class="row-between" style="font-size:12px;padding:8px;background:var(--s2);border-radius:9px">
+              <span style="color:var(--t2)">You this month</span><span style="color:var(--mint);font-weight:600">48.2 kg</span>
+            </div>
+            <div class="row-between" style="font-size:12px;padding:8px;background:var(--s2);border-radius:9px">
+              <span style="color:var(--t2)">Avg Zero Ink user</span><span style="color:var(--t1);font-weight:600">54.7 kg</span>
+            </div>
+            <div class="row-between" style="font-size:12px;padding:8px;background:var(--s2);border-radius:9px">
+              <span style="color:var(--t2)">US national average</span><span style="color:var(--red);font-weight:600">89.4 kg</span>
+            </div>
+            <div class="row-between" style="font-size:12px;padding:8px;background:var(--s2);border-radius:9px">
+              <span style="color:var(--t2)">Paris Agreement target</span><span style="color:var(--amber);font-weight:600">41.7 kg</span>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ph"><div class="ph-title">Top Reduction Tips</div></div>
+          <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;color:var(--t2)">
+            <div style="padding:9px;background:var(--s2);border-radius:9px;border-left:3px solid var(--mint)">
+              🚗 <strong style="color:var(--t1)">Gas Station</strong> is your #1 carbon source. Consider carpooling or EV — saves ~18 kg/month.
+            </div>
+            <div style="padding:9px;background:var(--s2);border-radius:9px;border-left:3px solid var(--blue)">
+              🥩 Reducing beef consumption to 2x/week would drop your food carbon by ~30%.
+            </div>
+            <div style="padding:9px;background:var(--s2);border-radius:9px;border-left:3px solid var(--amber)">
+              ✈️ Your March flight adds ~180 kg. Consider carbon offsets — we'll find the cheapest ones.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MERCHANT -->
+  <div class="view" id="view-merchant">
+    <div class="sh"><div class="sh-eye">Merchant Portal</div><div class="sh-title">Send Digital Receipts ⚡</div><div class="sh-sub">Replace your thermal printer forever. Enter a customer's 4-digit code and their receipt arrives instantly.</div></div>
+
+    <div class="merchant-stats-grid mb12">
+      <div class="mstat"><div class="mstat-val">1,247</div><div class="mstat-lbl">Receipts Sent</div></div>
+      <div class="mstat"><div class="mstat-val">$0</div><div class="mstat-lbl">Paper Costs</div></div>
+      <div class="mstat"><div class="mstat-val">4.9★</div><div class="mstat-lbl">Customer Rating</div></div>
+      <div class="mstat"><div class="mstat-val">98%</div><div class="mstat-lbl">Delivery Rate</div></div>
+    </div>
+
+    <div class="g2l">
+      <div class="gc">
+        <div class="card">
+          <div class="ph"><div class="ph-title">POS Terminal Simulator</div></div>
+          <div class="pos-wrap">
+            <div class="pos-terminal">
+              <div class="pos-store">🍔 Burger Republic</div>
+              <div class="pos-sub-lbl">Table 7 · Server: Alex</div>
+
+              <div class="pos-items">
+                <div class="pos-item-row"><span>Classic Burger</span><span>$14.99</span></div>
+                <div class="pos-item-row"><span>Sweet Potato Fries</span><span>$4.99</span></div>
+                <div class="pos-item-row"><span>Lemonade</span><span>$3.49</span></div>
+                <div class="pos-item-row" style="font-weight:600;color:var(--t1)"><span>Tax (8.5%)</span><span>$1.99</span></div>
+              </div>
+              <div class="pos-total">$25.46</div>
+
+              <div id="pos-main">
+                <div class="pos-prompt">Enter customer's Zero Ink code for digital receipt:</div>
+                <div class="pos-code-input">
+                  <input class="pos-digit" id="pd0" maxlength="1" type="text" pattern="[0-9]" inputmode="numeric" oninput="posDigit(0,this)">
+                  <input class="pos-digit" id="pd1" maxlength="1" type="text" pattern="[0-9]" inputmode="numeric" oninput="posDigit(1,this)">
+                  <input class="pos-digit" id="pd2" maxlength="1" type="text" pattern="[0-9]" inputmode="numeric" oninput="posDigit(2,this)">
+                  <input class="pos-digit" id="pd3" maxlength="1" type="text" pattern="[0-9]" inputmode="numeric" oninput="posDigit(3,this)">
+                </div>
+                <button class="pos-send-btn" id="pos-send-btn" disabled onclick="sendReceipt()">Send Receipt →</button>
+                <div class="pos-keypad">
+                  <div class="pk" onclick="posKey('1')">1</div><div class="pk" onclick="posKey('2')">2</div><div class="pk" onclick="posKey('3')">3</div>
+                  <div class="pk" onclick="posKey('4')">4</div><div class="pk" onclick="posKey('5')">5</div><div class="pk" onclick="posKey('6')">6</div>
+                  <div class="pk" onclick="posKey('7')">7</div><div class="pk" onclick="posKey('8')">8</div><div class="pk" onclick="posKey('9')">9</div>
+                  <div class="pk clr" onclick="posClear()">CLR</div><div class="pk" onclick="posKey('0')">0</div><div class="pk bk" onclick="posBack()">⌫</div>
+                </div>
+              </div>
+
+              <div class="pos-success" id="pos-success">
+                <div class="pos-suc-icon">✅</div>
+                <div class="pos-suc-title">Receipt Delivered!</div>
+                <div class="pos-suc-sub">Customer 7429 received their receipt<br>in 0.3 seconds. No paper. No email.</div>
+                <button class="pos-send-btn" style="margin-top:14px" onclick="posReset()">New Receipt</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="gc">
+        <div class="card">
+          <div class="ph"><div class="ph-title">Recent Deliveries</div></div>
+          <div id="merchant-recent"></div>
+        </div>
+        <div class="card">
+          <div class="ph"><div class="ph-title">Paper Savings Calculator</div></div>
+          <div class="fg"><label>Receipts Per Day</label><input type="number" id="calc-daily" value="80" min="1" oninput="calcSavings()"></div>
+          <div style="background:var(--s2);border-radius:10px;padding:12px;margin-top:8px">
+            <div class="row-between" style="font-size:12px;margin-bottom:5px"><span style="color:var(--t2)">Monthly paper cost</span><span id="calc-monthly" style="color:var(--red);font-weight:600">$96/mo</span></div>
+            <div class="row-between" style="font-size:12px;margin-bottom:5px"><span style="color:var(--t2)">Annual paper cost</span><span id="calc-annual" style="color:var(--red);font-weight:600">$1,152/yr</span></div>
+            <div class="row-between" style="font-size:12px;margin-bottom:5px"><span style="color:var(--t2)">Zero Ink plan</span><span style="color:var(--mint);font-weight:600">$49/mo</span></div>
+            <div class="divider"></div>
+            <div class="row-between" style="font-size:13px;font-weight:700"><span>You save</span><span id="calc-save" style="color:var(--mint)">$564/yr</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="view" id="view-settings">
+    <div class="sh"><div class="sh-eye">Preferences</div><div class="sh-title">Settings</div></div>
+    <div style="max-width:560px">
+      <div class="settings-section">
+        <div class="settings-title">Account</div>
+        <div class="settings-row">
+          <div class="sr-left">
+            <div class="sr-icon" style="background:var(--mdim)">👤</div>
+            <div><div class="sr-name">Vamsi Krishna Singara</div><div class="sr-sub"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="3c4a5d514f557c4c55535259594e4f535a484b5d4e59125553">[email&#160;protected]</a></div></div>
+          </div>
+          <span style="font-size:11px;color:var(--mint);font-family:var(--fm)">PRO</span>
+        </div>
+        <div class="settings-row">
+          <div class="sr-left">
+            <div class="sr-icon" style="background:var(--mdim)">🔑</div>
+            <div><div class="sr-name">Your Code</div><div class="sr-sub">7429 · Tap to copy</div></div>
+          </div>
+          <span style="font-family:var(--fm);font-size:18px;font-weight:500;color:var(--mint);letter-spacing:.15em">7429</span>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-title">Privacy & Security</div>
+        <div class="settings-row" onclick="toggleSetting(this)">
+          <div class="sr-left">
+            <div class="sr-icon" style="background:rgba(168,85,247,.12)">👻</div>
+            <div><div class="sr-name">Ghost Mode</div><div class="sr-sub">Shop anonymously by default</div></div>
+          </div>
+          <div class="toggle" id="toggle-ghost"></div>
+        </div>
+        <div class="settings-row" onclick="toggleSetting(this)">
+          <div class="sr-left">
+            <div class="sr-icon" style="background:rgba(255,77,106,.1)">🔒</div>
+            <div><div class="sr-name">Biometric Lock</div><div class="sr-sub">Face ID / Touch ID to open app</div></div>
+          </div>
+          <div class="toggle on"></div>
+        </div>
+        <div class="settings-row" onclick="toggleSetting(this)">
+          <div class="sr-left">
+            <div class="sr-icon" style="background:rgba(77,159,255,.1)">🧹</div>
+            <div><div class="sr-name">Auto-Delete Old Receipts</div><div class="sr-sub">Remove receipts older than 2 years</div></div>
+          </div>
+          <div class="toggle"></div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-title">Notifications</div>
+        <div class="settings-row" onclick="toggleSetting(this)">
+          <div class="sr-left">
+            <div class="sr-icon" style="background:rgba(255,184,48,.1)">📡</div>
+            <div><div class="sr-name">Refund Radar Alerts</div><div class="sr-sub">Notify when price drops detected</div></div>
+          </div>
+          <div class="toggle on"></div>
+        </div>
+        <div class="settings-row" onclick="toggleSetting(this)">
+          <div class="sr-left">
+            <div class="sr-icon" style="background:rgba(0,229,160,.07)">🧾</div>
+            <div><div class="sr-name">New Receipt Alert</div><div class="sr-sub">Ping me when a receipt arrives</div></div>
+          </div>
+          <div class="toggle on"></div>
+        </div>
+        <div class="settings-row" onclick="toggleSetting(this)">
+          <div class="sr-left">
+            <div class="sr-icon" style="background:rgba(77,159,255,.1)">⚔️</div>
+            <div><div class="sr-name">Battle Updates</div><div class="sr-sub">Weekly battle standings</div></div>
+          </div>
+          <div class="toggle on"></div>
+        </div>
+        <div class="settings-row" onclick="toggleSetting(this)">
+          <div class="sr-left">
+            <div class="sr-icon" style="background:rgba(0,229,160,.07)">🌱</div>
+            <div><div class="sr-name">Weekly Carbon Report</div><div class="sr-sub">Environmental impact summary</div></div>
+          </div>
+          <div class="toggle on"></div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-title">Features</div>
+        <div class="settings-row" onclick="toggleSetting(this)">
+          <div class="sr-left">
+            <div class="sr-icon" style="background:rgba(0,229,160,.07)">📊</div>
+            <div><div class="sr-name">Zero Ink Score</div><div class="sr-sub">Track your financial health score</div></div>
+          </div>
+          <div class="toggle on"></div>
+        </div>
+        <div class="settings-row" onclick="toggleSetting(this)">
+          <div class="sr-left">
+            <div class="sr-icon" style="background:rgba(77,159,255,.1)">⏳</div>
+            <div><div class="sr-name">Time Capsules</div><div class="sr-sub">Lock receipts for future comparison</div></div>
+          </div>
+          <div class="toggle on"></div>
+        </div>
+        <div class="settings-row" onclick="toggleSetting(this)">
+          <div class="sr-left">
+            <div class="sr-icon" style="background:rgba(0,229,160,.07)">🌍</div>
+            <div><div class="sr-name">Carbon Tracking</div><div class="sr-sub">Environmental impact per receipt</div></div>
+          </div>
+          <div class="toggle on"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- TOAST NOTIFICATION -->
+<div class="toast" id="toast">
+  <div class="toast-head"><div class="toast-dot"></div><div class="toast-title">Receipt Received ⚡</div></div>
+  <div class="toast-store" id="toast-store">Burger Republic</div>
+  <div class="toast-amt" id="toast-amt">$25.46</div>
+  <div class="toast-items-lbl" id="toast-items">Classic Burger · Fries · Lemonade</div>
+  <div class="toast-carbon">🌱 <span id="toast-carbon">2.4 kg CO₂ · Below average</span></div>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// ═══════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════
+const receipts = [
+  {id:1,icon:'🍔',name:'Burger Republic',cat:'Food & Drink',date:'Today, 10:34 AM',amount:25.46,items:'Classic Burger, Fries, Lemonade',ghost:false,carbon:2.4,refund:false},
+  {id:2,icon:'☕',name:'Blue Stone Coffee',cat:'Food & Drink',date:'Today, 8:12 AM',amount:7.40,items:'Oat Latte, Blueberry Muffin',ghost:true,carbon:0.3,refund:false},
+  {id:3,icon:'🛒',name:'Fresh Market',cat:'Shopping',date:'Yesterday, 6:45 PM',amount:52.30,items:'Groceries (14 items)',ghost:false,carbon:5.8,refund:true,refundAmt:6.20},
+  {id:4,icon:'💊',name:'Walgreens',cat:'Health',date:'Mar 15, 3:20 PM',amount:34.80,items:'Vitamins, Sunscreen, Band-aids',ghost:true,carbon:0.8,refund:false},
+  {id:5,icon:'⛽',name:'Shell Gas Station',cat:'Transport',date:'Mar 14, 11:00 AM',amount:68.20,items:'18.4 gal @ $3.71',ghost:false,carbon:18.2,refund:false},
+  {id:6,icon:'🎬',name:'AMC Theaters',cat:'Entertainment',date:'Mar 13, 7:30 PM',amount:31.50,items:'2x Tickets, Popcorn, Drinks',ghost:false,carbon:1.2,refund:true,refundAmt:5.00},
+  {id:7,icon:'🍕',name:'Dominos',cat:'Food & Drink',date:'Mar 12, 8:15 PM',amount:22.99,items:'Large Pizza, Wings',ghost:true,carbon:3.1,refund:false},
+  {id:8,icon:'👟',name:'Nike Store',cat:'Shopping',date:'Mar 11, 2:00 PM',amount:129.99,items:'Air Max 270',ghost:false,carbon:4.6,refund:true,refundAmt:20.00},
+];
+
+const battles = [
+  {name:'Food Battle — March',opponent:'Ravi K.',opponentAmt:187,myAmt:142,total:30,elapsed:22,status:'live',category:'Food & Dining'},
+  {name:'Coffee Challenge',opponent:'Priya M.',opponentAmt:31,myAmt:29,total:14,elapsed:10,status:'winning',category:'Coffee'},
+  {name:'Shopping Showdown',opponent:'Arun T.',opponentAmt:89,myAmt:134,total:30,elapsed:30,status:'live',category:'Shopping'},
+];
+
+const capsules = [
+  {icon:'🛒',name:'Whole Foods Haul',date:'Locked Mar 2025',openDate:'Mar 2026',amount:94.20,currentAmt:106.80,unlocked:true,days:0},
+  {icon:'⛽',name:'Gas Fill-up',date:'Locked Jan 2026',openDate:'Jan 2027',amount:68.20,currentAmt:null,unlocked:false,days:290,hrs:6,mins:42},
+  {icon:'☕',name:'Monthly Coffee',date:'Locked Feb 2026',openDate:'Feb 2027',amount:47.80,currentAmt:null,unlocked:false,days:320,hrs:14,mins:12},
+  {icon:'🏥',name:'Doctor Visit',date:'Locked Mar 2026',openDate:'Mar 2027',amount:120.00,currentAmt:null,unlocked:false,days:364,hrs:2,mins:55},
+];
+
+const radarAlerts = [
+  {icon:'👟',merchant:'Nike Store',item:'Air Max 270 — Size 10',bought:129.99,nowPrice:109.99,savings:20.00,days:6,script:"Hi, I purchased a pair of Air Max 270 sneakers 6 days ago for $129.99. I noticed the price has dropped to $109.99 online and in-store. Do you offer a price adjustment within 30 days? My receipt number is #ZI-008."},
+  {icon:'🛒',merchant:'Fresh Market',item:'Organic Groceries Bundle',bought:52.30,nowPrice:46.10,savings:6.20,days:2,script:"Hello, I shopped here 2 days ago and spent $52.30. I see several items I bought are now on sale. Could I get a price adjustment on those items? I have my Zero Ink digital receipt."},
+  {icon:'🎬',merchant:'AMC Theaters',item:'Tuesday Discount (retroactive)',bought:31.50,nowPrice:26.50,savings:5.00,days:4,script:"Hi, I bought tickets on Sunday for the evening show. I noticed AMC has a discount program for Tuesdays. I'd love to apply any eligible credit to a future visit — is that something you can help with?"},
+];
+
+const carbonItems = [
+  {icon:'⛽',name:'Shell Gas Station',detail:'18.4 gallons',kg:18.2,max:20,color:'var(--red)'},
+  {icon:'🛒',name:'Fresh Market',detail:'Groceries (meat, dairy)',kg:5.8,max:10,color:'var(--amber)'},
+  {icon:'👟',name:'Nike Store',detail:'Manufactured goods',kg:4.6,max:10,color:'var(--amber)'},
+  {icon:'🍔',name:'Burger Republic',detail:'Beef, food service',kg:2.4,max:5,color:'var(--blue)'},
+  {icon:'🍕',name:'Dominos',detail:'Delivery packaging',kg:3.1,max:5,color:'var(--blue)'},
+  {icon:'🎬',name:'AMC Theaters',detail:'Energy use, concessions',kg:1.2,max:5,color:'var(--mint)'},
+  {icon:'☕',name:'Blue Stone Coffee',detail:'Cup, dairy',kg:0.3,max:1,color:'var(--mint)'},
+  {icon:'💊',name:'Walgreens',detail:'Packaging, transit',kg:0.8,max:2,color:'var(--mint)'},
+];
+
+const merchantRecent = [
+  {code:'7429',time:'10:34 AM',amt:25.46,items:'3 items'},
+  {code:'3311',time:'10:12 AM',amt:44.80,items:'6 items'},
+  {code:'8872',time:'9:55 AM',amt:12.99,items:'1 item'},
+  {code:'5544',time:'9:30 AM',amt:67.20,items:'8 items'},
+  {code:'1190',time:'9:08 AM',amt:18.75,items:'2 items'},
+];
+
+const spendData = [
+  {lbl:'Oct',val:620},{lbl:'Nov',val:780},{lbl:'Dec',val:1020},
+  {lbl:'Jan',val:710},{lbl:'Feb',val:690},{lbl:'Mar',val:841,cur:true},
+];
+
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+let ghostOn = false;
+let currentView = 'dashboard';
+let posCode = '';
+let notifOpen = false;
+
+// ═══════════════════════════════════════
+// VIEW ROUTING
+// ═══════════════════════════════════════
+const viewTitles = {
+  dashboard:'Dashboard',receipts:'My Receipts',ghost:'Ghost Mode',
+  radar:'Refund Radar',battles:'Receipt Battles',capsule:'Time Capsule',
+  carbon:'Carbon Tracker',merchant:'Merchant Portal',settings:'Settings'
+};
+
+function setView(v) {
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(el=>el.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  const nb = document.getElementById('nb-'+v);
+  if(nb) nb.classList.add('active');
+  document.getElementById('topbar-title').textContent = viewTitles[v]||v;
+  currentView = v;
+  if(notifOpen){notifOpen=false;}
+}
+
+function switchMode(mode, btn) {
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(mode==='merchant') setView('merchant');
+  else setView('dashboard');
+}
+
+// ═══════════════════════════════════════
+// GHOST MODE
+// ═══════════════════════════════════════
+function toggleGhost() {
+  ghostOn = !ghostOn;
+  const chip = document.getElementById('ghost-chip');
+  const lbl = document.getElementById('ghost-label');
+  const btn = document.getElementById('ghost-big-btn');
+  const tg = document.getElementById('toggle-ghost');
+  chip.classList.toggle('on', ghostOn);
+  lbl.textContent = ghostOn ? 'Ghost On' : 'Ghost Off';
+  if(btn) btn.textContent = ghostOn ? '👻 Ghost Mode Active' : '🔐 Enable Ghost Mode';
+  if(btn) btn.classList.toggle('active', ghostOn);
+  if(tg) tg.classList.toggle('on', ghostOn);
+}
+
+// ═══════════════════════════════════════
+// RENDER RECEIPTS
+// ═══════════════════════════════════════
+function receiptHTML(r, compact=false) {
+  const tags = [];
+  if(r.ghost) tags.push(`<span class="rtag tg">👻 Ghost</span>`);
+  if(r.refund) tags.push(`<span class="rtag ta">📡 Price Drop</span>`);
+  tags.push(`<span class="rtag tc">🌱 ${r.carbon}kg</span>`);
+  return `
+  <div class="receipt-row ${r.refund?'alert':''}" onclick="receiptClick(${r.id})">
+    <div class="ricon">${r.icon}</div>
+    <div class="rinfo">
+      <div class="rname">${r.name}</div>
+      <div class="rmeta">${r.date} · ${tags.join('')}</div>
+    </div>
+    <div class="ramount">$${r.amount.toFixed(2)}<span class="rcarbon">🌱 ${r.carbon}kg CO₂</span></div>
+  </div>`;
+}
+
+function renderDashReceipts() {
+  const el = document.getElementById('dash-receipts');
+  if(el) el.innerHTML = receipts.slice(0,5).map(r=>receiptHTML(r,true)).join('');
+}
+
+function renderAllReceipts(filter='', cat='') {
+  const el = document.getElementById('all-receipts');
+  if(!el) return;
+  let list = receipts;
+  if(filter) list = list.filter(r=>r.name.toLowerCase().includes(filter.toLowerCase())||r.items.toLowerCase().includes(filter.toLowerCase()));
+  if(cat) list = list.filter(r=>r.cat===cat);
+  el.innerHTML = list.map(r=>receiptHTML(r)).join('') || '<div style="text-align:center;padding:32px;color:var(--t3)">No receipts found</div>';
+}
+
+function filterReceipts(filter=null, cat=null) {
+  const fi = document.querySelector('#view-receipts input');
+  const ci = document.querySelector('#view-receipts select');
+  renderAllReceipts(filter!==null?filter:fi?.value, cat!==null?cat:ci?.value);
+}
+
+function receiptClick(id) {
+  const r = receipts.find(x=>x.id===id);
+  if(!r) return;
+  showToast(r.name,'$'+r.amount.toFixed(2),r.items,r.carbon+' kg CO₂ · Click for details');
+}
+
+// ═══════════════════════════════════════
+// RENDER SCORE + CHART
+// ═══════════════════════════════════════
+function renderSpendChart() {
+  const el = document.getElementById('spend-chart');
+  if(!el) return;
+  const max = Math.max(...spendData.map(d=>d.val));
+  el.innerHTML = spendData.map(d=>`
+    <div class="sbar-wrap">
+      <div class="sbar ${d.cur?'cur':''}" style="height:${Math.round((d.val/max)*100)}%" title="$${d.val}"></div>
+      <div class="sbar-lbl">${d.lbl}</div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════
+// RENDER GHOST RECEIPTS
+// ═══════════════════════════════════════
+function renderGhostReceipts() {
+  const el = document.getElementById('ghost-receipts-list');
+  if(!el) return;
+  const ghostList = receipts.filter(r=>r.ghost);
+  el.innerHTML = ghostList.map(r=>receiptHTML(r)).join('');
+}
+
+// ═══════════════════════════════════════
+// RENDER RADAR
+// ═══════════════════════════════════════
+function renderRadar() {
+  const el = document.getElementById('radar-alerts');
+  if(!el) return;
+  el.innerHTML = radarAlerts.map((a,i)=>`
+  <div class="radar-card" onclick="toggleRadar(${i})" id="radar-${i}">
+    <div class="radar-top">
+      <div class="radar-icon">${a.icon}</div>
+      <div class="radar-info">
+        <div class="radar-merchant">${a.merchant}</div>
+        <div class="radar-item">${a.item}</div>
+        <div style="font-size:10px;color:var(--t3);margin-top:4px;font-family:var(--fm)">
+          Bought ${a.days} days ago · Was $${a.bought.toFixed(2)} → Now $${a.nowPrice.toFixed(2)}
+        </div>
+      </div>
+      <div>
+        <div class="radar-save">$${a.savings.toFixed(2)}<span>potential refund</span></div>
+      </div>
+    </div>
+    <div class="radar-script">💬 <strong>Script to use:</strong><br>"${a.script}"</div>
+    <button class="radar-btn">📋 Copy Script & Go Claim</button>
+  </div>`).join('');
+}
+
+function toggleRadar(i) {
+  const card = document.getElementById('radar-'+i);
+  const wasOpen = card.classList.contains('open');
+  document.querySelectorAll('.radar-card').forEach(c=>c.classList.remove('open'));
+  if(!wasOpen) card.classList.add('open');
+}
+
+// ═══════════════════════════════════════
+// RENDER BATTLES
+// ═══════════════════════════════════════
+function renderBattles() {
+  const el = document.getElementById('battles-list');
+  if(!el) return;
+  el.innerHTML = battles.map((b,i)=>{
+    const myPct = Math.round((b.myAmt/(b.myAmt+b.opponentAmt))*100);
+    const statusClass = b.status==='winning'?'b-win':b.status==='live'?'b-live':'b-pend';
+    const statusText = b.status==='winning'?'WINNING':b.status==='live'?'LIVE':'PENDING';
+    return `
+    <div class="battle-card">
+      <div class="battle-stripe"></div>
+      <div class="battle-head">
+        <div class="battle-name">${b.name}</div>
+        <span class="battle-badge ${statusClass}">${statusText}</span>
+      </div>
+      <div class="battle-vs">
+        <div class="bplayer">
+          <div class="bplayer-name">You</div>
+          <div class="bplayer-amt you">$${b.myAmt}</div>
+        </div>
+        <div class="bvs">VS</div>
+        <div class="bplayer">
+          <div class="bplayer-name">${b.opponent}</div>
+          <div class="bplayer-amt them">$${b.opponentAmt}</div>
+        </div>
+      </div>
+      <div class="battle-track"><div class="battle-fill" style="width:${myPct}%"></div></div>
+      <div class="battle-days">Day ${b.elapsed} of ${b.total} · ${b.category}</div>
+    </div>`;
+  }).join('');
+}
+
+function showNewBattle() {
+  const form = document.getElementById('new-battle-form');
+  form.style.display = form.style.display==='none' ? 'block' : 'none';
+}
+
+function startBattle() {
+  showToast('Battle Started! ⚔️','Challenge Sent','Your opponent has been notified','Receipt data will auto-sync');
+  document.getElementById('new-battle-form').style.display = 'none';
+}
+
+// ═══════════════════════════════════════
+// RENDER CAPSULES
+// ═══════════════════════════════════════
+function renderCapsules() {
+  const el = document.getElementById('capsule-grid');
+  if(!el) return;
+  el.innerHTML = capsules.map(c=>`
+  <div class="capsule-card">
+    <div class="cap-lock">${c.unlocked?'🔓':c.icon}</div>
+    <div class="cap-name">${c.name}</div>
+    <div class="cap-date">${c.date} · Opens ${c.openDate}</div>
+    <div class="cap-amt">${c.unlocked?'$'+c.amount.toFixed(2):'$'+c.amount.toFixed(2)}</div>
+    ${c.unlocked?`<div class="cap-inflation">Today same items: <span class="hi">$${c.currentAmt}</span> (+${((c.currentAmt-c.amount)/c.amount*100).toFixed(1)}% inflation)</div>`:`
+    <div class="cap-countdown">
+      <div class="ctu"><div class="ctn">${c.days}</div><div class="ctl">Days</div></div>
+      <div class="ctu"><div class="ctn">${c.hrs||0}</div><div class="ctl">Hrs</div></div>
+      <div class="ctu"><div class="ctn">${c.mins||0}</div><div class="ctl">Min</div></div>
+    </div>`}
+  </div>`).join('');
+
+  // Set default date to 1yr from now
+  const d = new Date(); d.setFullYear(d.getFullYear()+1);
+  const el2 = document.getElementById('capsule-date');
+  if(el2) el2.value = d.toISOString().split('T')[0];
+}
+
+function createCapsule() {
+  showToast('Time Capsule Locked! ⏳','Locked Until '+document.getElementById('capsule-date').value,'Receipt sealed. See you in a year!','Inflation will be revealed when you open it');
+}
+
+// ═══════════════════════════════════════
+// RENDER CARBON
+// ═══════════════════════════════════════
+function renderCarbon() {
+  const el = document.getElementById('carbon-list');
+  if(!el) return;
+  el.innerHTML = carbonItems.map(c=>`
+  <div class="carbon-item">
+    <div class="ci-icon">${c.icon}</div>
+    <div class="ci-info">
+      <div class="ci-name">${c.name}</div>
+      <div class="ci-detail">${c.detail}</div>
+    </div>
+    <div class="ci-bar"><div class="ci-fill" style="width:${(c.kg/c.max)*100}%;background:${c.color}"></div></div>
+    <div class="ci-kg">${c.kg} kg</div>
+  </div>`).join('');
+}
+
+// ═══════════════════════════════════════
+// RENDER MERCHANT
+// ═══════════════════════════════════════
+function renderMerchant() {
+  const el = document.getElementById('merchant-recent');
+  if(!el) return;
+  el.innerHTML = merchantRecent.map(r=>`
+  <div class="merchant-row">
+    <div class="merchant-code">${r.code}</div>
+    <div style="flex:1">
+      <div style="font-size:12px;font-weight:500">${r.items}</div>
+      <div class="merchant-time">${r.time}</div>
+    </div>
+    <div class="merchant-amt">$${r.amt.toFixed(2)}</div>
+    <div style="width:8px;height:8px;background:var(--mint);border-radius:50%"></div>
+  </div>`).join('');
+}
+
+// ═══════════════════════════════════════
+// POS TERMINAL
+// ═══════════════════════════════════════
+function posKey(k) {
+  if(posCode.length>=4) return;
+  posCode += k;
+  updatePosDisplay();
+}
+
+function posBack() {
+  posCode = posCode.slice(0,-1);
+  updatePosDisplay();
+}
+
+function posClear() {
+  posCode = '';
+  updatePosDisplay();
+}
+
+function posDigit(i, el) {
+  const v = el.value.replace(/\D/g,'');
+  el.value = v;
+  if(v) { posCode = ''; }
+  const digits = document.querySelectorAll('.pos-digit');
+  let code = '';
+  digits.forEach(d=>code+=d.value);
+  posCode = code;
+  if(v && i<3) digits[i+1].focus();
+  updatePosDisplay();
+}
+
+function updatePosDisplay() {
+  const digits = document.querySelectorAll('.pos-digit');
+  digits.forEach((d,i)=>{
+    if(!d.matches(':focus')) d.value = posCode[i]||'';
+    d.classList.toggle('filled', !!posCode[i]);
+  });
+  const btn = document.getElementById('pos-send-btn');
+  if(btn) btn.disabled = posCode.length<4;
+}
+
+function sendReceipt() {
+  if(posCode.length<4) return;
+  document.getElementById('pos-main').style.display='none';
+  document.getElementById('pos-success').classList.add('show');
+  setTimeout(()=>{
+    document.getElementById('toast-store').textContent='Burger Republic';
+    document.getElementById('toast-amt').textContent='$25.46';
+    document.getElementById('toast-items').textContent='Classic Burger, Fries, Lemonade';
+    document.getElementById('toast-carbon').textContent='2.4 kg CO₂ · Below average';
+    showToast('Burger Republic','$25.46','Classic Burger, Fries, Lemonade','2.4 kg CO₂ · Below average');
+  }, 500);
+}
+
+function posReset() {
+  posCode='';
+  document.getElementById('pos-main').style.display='block';
+  document.getElementById('pos-success').classList.remove('show');
+  updatePosDisplay();
+  document.querySelectorAll('.pos-digit').forEach(d=>{d.value='';d.classList.remove('filled')});
+}
+
+// ═══════════════════════════════════════
+// SAVINGS CALCULATOR
+// ═══════════════════════════════════════
+function calcSavings() {
+  const daily = parseInt(document.getElementById('calc-daily')?.value)||80;
+  const rollCost = 0.04; // per receipt
+  const monthly = Math.round(daily*30*rollCost);
+  const annual = monthly*12;
+  const zeroInkPlan = 49;
+  const save = annual - (zeroInkPlan*12);
+  document.getElementById('calc-monthly').textContent='$'+monthly+'/mo';
+  document.getElementById('calc-annual').textContent='$'+annual+'/yr';
+  document.getElementById('calc-save').textContent='$'+Math.max(0,save)+'/yr';
+}
+
+// ═══════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════
+let toastTimer;
+function showToast(store, amt, items, carbon) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-store').textContent=store;
+  document.getElementById('toast-amt').textContent=amt;
+  document.getElementById('toast-items').textContent=items;
+  document.getElementById('toast-carbon').textContent=carbon;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 4000);
+}
+
+// ═══════════════════════════════════════
+// TOGGLES
+// ═══════════════════════════════════════
+function toggleSetting(row) {
+  const toggle = row.querySelector('.toggle');
+  if(toggle) toggle.classList.toggle('on');
+}
+
+function copyCode() {
+  navigator.clipboard?.writeText('7429').catch(()=>{});
+  showToast('Code Copied!','7429','Your Zero Ink code is ready to use','Share at checkout — stays private');
+}
+
+function toggleNotifs() {
+  // simple alert for demo
+  showToast('📡 Refund Alert','Fresh Market','Price dropped $6.20 on your last purchase!','Tap Radar to claim your refund');
+}
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+function init() {
+  renderDashReceipts();
+  renderSpendChart();
+  renderAllReceipts();
+  renderGhostReceipts();
+  renderRadar();
+  renderBattles();
+  renderCapsules();
+  renderCarbon();
+  renderMerchant();
+ 
