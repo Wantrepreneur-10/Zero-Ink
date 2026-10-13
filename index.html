@@ -2,513 +2,380 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#07090d">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Zero Ink">
-<title>Zero Ink</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0A0C10">
+<title>Zero Ink — digital receipts in four digits</title>
+<meta name="description" content="Your customer gives you a four-digit code at checkout. Their receipt lands on their phone instantly. No paper, no printer, nothing to install.">
+<meta property="og:title" content="Zero Ink — digital receipts in four digits">
+<meta property="og:description" content="No paper. No printer. Your customer's receipt arrives on their phone before they've put their wallet away.">
+<meta property="og:type" content="website">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#07090d;--s1:#0d1018;--s2:#131720;--s3:#191e2a;--b1:#1d2535;--b2:#263045;
-  --mint:#00e5a0;--mint2:#00c98a;--mdim:rgba(0,229,160,0.08);--mglow:rgba(0,229,160,0.16);
-  --amber:#ffb830;--blue:#4d9fff;--red:#ff4d6a;--purple:#a855f7;
-  --t1:#edf2fa;--t2:#8892a8;--t3:#5a6478;
-  --fd:'Syne',sans-serif;--fb:'DM Sans',sans-serif;--fm:'DM Mono',monospace;
+  --ink:#0A0C10;
+  --ink-2:#11141B;
+  --line:#1E2530;
+  --paper:#F6F3EA;
+  --paper-2:#E4DFD2;
+  --mint:#00E5A0;
+  --mint-deep:#00B377;
+  --text:#EEF2F7;
+  --muted:#7E8899;
+  --f-display:'Syne',system-ui,sans-serif;
+  --f-body:'DM Sans',system-ui,sans-serif;
+  --f-slip:'DM Mono',ui-monospace,monospace;
 }
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%}
-body{background:var(--bg);color:var(--t1);font-family:var(--fb);font-size:15px;line-height:1.5;overflow:hidden}
-#app{height:100%;display:flex;flex-direction:column;max-width:480px;margin:0 auto;position:relative}
-.view{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:20px 18px 90px}
-.hidden{display:none!important}
-input,button,select{font-family:inherit;font-size:16px;outline:none;border:none}
-button{cursor:pointer}
-.mono{font-family:var(--fm)}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--ink);color:var(--text);
+  font-family:var(--f-body);font-size:17px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--mint);outline-offset:3px;border-radius:4px}
+.wrap{width:100%;max-width:1060px;margin:0 auto;padding:0 24px}
 
-/* logo */
-.logo-drop{display:inline-block;vertical-align:middle}
+/* ---- perforation divider: the receipt tear ---- */
+.perf{
+  height:1px;width:100%;
+  background:repeating-linear-gradient(90deg,var(--line) 0 7px,transparent 7px 15px);
+}
 
-/* AUTH */
-.auth-wrap{height:100%;display:flex;flex-direction:column;justify-content:center;padding:28px;overflow-y:auto}
-.auth-logo{width:76px;height:76px;border-radius:20px;background:var(--bg);display:flex;align-items:center;justify-content:center;margin:0 auto 18px}
-.auth-title{font-family:var(--fd);font-size:34px;font-weight:800;text-align:center;letter-spacing:-.5px}
-.auth-sub{color:var(--t2);text-align:center;margin-top:4px;margin-bottom:30px}
-.field{margin-bottom:12px}
-.field label{display:block;font-size:11px;color:var(--t3);font-family:var(--fm);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
-.field input{width:100%;background:var(--s2);border:1px solid var(--b2);border-radius:12px;color:var(--t1);padding:14px}
-.field input:focus{border-color:var(--mint)}
-.btn-primary{width:100%;background:var(--mint);color:var(--bg);font-family:var(--fd);font-weight:800;font-size:16px;padding:15px;border-radius:12px;margin-top:6px}
-.btn-primary:active{opacity:.85}
-.btn-primary:disabled{opacity:.45}
-.auth-switch{text-align:center;color:var(--mint);margin-top:18px;font-size:14px;padding:8px}
-.auth-err{background:rgba(255,77,106,.12);border:1px solid rgba(255,77,106,.3);color:#ff8095;border-radius:10px;padding:11px 13px;font-size:13px;margin-bottom:14px;display:none}
-.auth-err.show{display:block}
-.auth-role{display:flex;gap:8px;margin-bottom:16px}
-.role-opt{flex:1;background:var(--s2);border:1px solid var(--b2);border-radius:12px;padding:12px;text-align:center;font-size:13px;color:var(--t2);font-weight:600}
-.role-opt.on{background:var(--mdim);border-color:var(--mglow);color:var(--mint)}
-.role-opt .ri{font-size:20px;display:block;margin-bottom:4px}
+/* ---- nav ---- */
+header{position:sticky;top:0;z-index:50;background:rgba(10,12,16,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;gap:14px;height:66px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-weight:800;font-size:19px;letter-spacing:-.02em;text-decoration:none}
+.nav-sp{flex:1}
+.nav a.quiet{color:var(--muted);text-decoration:none;font-size:15px}
+.nav a.quiet:hover{color:var(--text)}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  font-family:var(--f-display);font-weight:700;font-size:15px;
+  padding:11px 20px;border-radius:10px;text-decoration:none;border:1px solid transparent;
+}
+.btn-solid{background:var(--mint);color:#04120C}
+.btn-solid:hover{background:#17f3b2}
+.btn-ghost{border-color:var(--line);color:var(--text)}
+.btn-ghost:hover{border-color:var(--mint);color:var(--mint)}
+.btn-lg{padding:15px 26px;font-size:17px;border-radius:12px}
 
-/* TOPBAR */
-.top{display:flex;align-items:center;gap:10px;padding:16px 18px 8px}
-.top-title{font-family:var(--fd);font-size:22px;font-weight:800;flex:1;letter-spacing:-.3px}
-.code-chip{display:flex;align-items:center;gap:8px;background:var(--mdim);border:1px solid var(--mglow);border-radius:11px;padding:7px 12px}
-.code-chip .lbl{font-size:9px;color:var(--t3);font-family:var(--fm);text-transform:uppercase;letter-spacing:.08em;line-height:1}
-.code-chip .val{font-family:var(--fm);font-size:18px;color:var(--mint);letter-spacing:.14em;line-height:1.1}
+/* ---- hero ---- */
+.hero{padding:76px 24px 64px}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center}
+h1{
+  font-family:var(--f-display);font-weight:800;
+  font-size:clamp(40px,5.6vw,66px);line-height:1.04;letter-spacing:-.03em;
+}
+.lede{color:var(--muted);font-size:19px;margin-top:22px;max-width:46ch}
+.hero-cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
+.hero-note{color:var(--muted);font-size:14px;margin-top:18px}
 
-/* CARD */
-.card{background:var(--s1);border:1px solid var(--b1);border-radius:16px;padding:16px;margin-bottom:12px}
-.card-t{font-family:var(--fd);font-size:14px;font-weight:700;margin-bottom:12px}
+/* ---- the receipt (signature element) ---- */
+.stage{display:flex;flex-direction:column;align-items:center;gap:20px}
+.keypad{
+  background:var(--ink-2);border:1px solid var(--line);border-radius:14px;
+  padding:16px 18px;width:100%;max-width:300px;
+}
+.keypad-label{font-family:var(--f-slip);font-size:11px;color:var(--muted);letter-spacing:.1em}
+.digits{display:flex;gap:9px;margin-top:10px}
+.digit{
+  flex:1;aspect-ratio:3/4;border-radius:10px;background:#0A0D12;border:1.5px solid #273040;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--f-display);font-weight:800;font-size:28px;color:var(--mint);
+  transition:border-color .2s,background .2s;
+}
+.digit.lit{border-color:var(--mint);background:rgba(0,229,160,.08)}
+.replay{
+  background:none;border:none;color:var(--muted);font-family:var(--f-body);font-size:13px;
+  cursor:pointer;padding:6px;text-decoration:underline;text-underline-offset:3px;
+}
+.replay:hover{color:var(--mint)}
 
-/* big code */
-.codebig{background:linear-gradient(135deg,#0c1f1a,#0d1018);border:1px solid var(--mglow);border-radius:18px;padding:22px;text-align:center;margin-bottom:14px;position:relative;overflow:hidden}
-.codebig::after{content:'';position:absolute;top:-40px;right:-40px;width:120px;height:120px;background:radial-gradient(circle,var(--mdim),transparent 70%);border-radius:50%}
-.codebig .k{font-size:11px;color:var(--t3);font-family:var(--fm);text-transform:uppercase;letter-spacing:.1em}
-.codebig .c{font-family:var(--fm);font-size:52px;color:var(--mint);letter-spacing:.18em;font-weight:500;margin:6px 0 2px}
-.codebig .h{font-size:12px;color:var(--t2)}
+.slip-hold{width:100%;max-width:300px;min-height:272px;display:flex;justify-content:center}
+.slip{
+  width:100%;background:var(--paper);color:#16181C;
+  font-family:var(--f-slip);font-size:13px;line-height:1.75;
+  padding:22px 20px 26px;position:relative;
+  transform-origin:top center;
+  box-shadow:0 24px 60px rgba(0,0,0,.5);
+}
+.slip::before,.slip::after{
+  content:'';position:absolute;left:0;right:0;height:9px;
+  background:
+    linear-gradient(-45deg,transparent 50%,var(--paper) 50%) repeat-x,
+    linear-gradient(45deg,transparent 50%,var(--paper) 50%) repeat-x;
+  background-size:11px 11px;
+}
+.slip::before{top:-9px;transform:scaleY(-1)}
+.slip::after{bottom:-9px}
+.slip.printing{animation:unroll .9s cubic-bezier(.22,.75,.3,1) both}
+@keyframes unroll{from{clip-path:inset(0 0 100% 0);opacity:.4}to{clip-path:inset(0 0 0 0);opacity:1}}
+.slip h4{font-family:var(--f-slip);font-weight:500;font-size:14px;letter-spacing:.06em;text-align:center}
+.slip .sub{text-align:center;color:#6B7078;font-size:11px;margin-bottom:12px}
+.rule{border-top:1px dashed #B9B2A2;margin:10px 0}
+.li{display:flex;justify-content:space-between;gap:12px}
+.li span:last-child{font-variant-numeric:tabular-nums}
+.tot{display:flex;justify-content:space-between;font-weight:500;font-size:15px;margin-top:4px}
+.slip .stamp{text-align:center;color:#6B7078;font-size:10.5px;margin-top:12px;letter-spacing:.04em}
 
-/* stats */
-.stat-row{display:flex;gap:10px;margin-bottom:12px}
-.stat{flex:1;background:var(--s1);border:1px solid var(--b1);border-radius:14px;padding:14px}
-.stat .v{font-family:var(--fd);font-size:24px;font-weight:800}
-.stat .l{font-size:11px;color:var(--t3);margin-top:3px}
+/* ---- sections ---- */
+section.wrap{padding:76px 24px}
+h2{font-family:var(--f-display);font-weight:800;font-size:clamp(28px,3.4vw,40px);letter-spacing:-.025em;line-height:1.12}
+.sec-lede{color:var(--muted);margin-top:14px;max-width:56ch}
 
-/* receipt row */
-.rrow{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--b1)}
-.rrow:last-child{border-bottom:none}
-.ricon{width:40px;height:40px;border-radius:11px;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-.rinfo{flex:1;min-width:0}
-.rname{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rmeta{font-size:11px;color:var(--t3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ramt{font-family:var(--fd);font-weight:800;font-size:16px}
-.empty{text-align:center;padding:36px 16px;color:var(--t3)}
-.empty .ei{font-size:38px;margin-bottom:10px}
-.empty .et{font-weight:700;color:var(--t2);margin-bottom:5px;font-size:15px}
+.reasons{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin-top:44px}
+.reason h3{font-family:var(--f-display);font-weight:700;font-size:20px;margin-bottom:9px;letter-spacing:-.01em}
+.reason p{color:var(--muted);font-size:16px}
+.reason .bar{width:34px;height:3px;background:var(--mint);margin-bottom:16px;border-radius:2px}
 
-/* merchant POS */
-.pos-items{background:var(--s2);border-radius:12px;padding:6px 12px;margin-bottom:12px}
-.pos-item{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--b1)}
-.pos-item:last-child{border-bottom:none}
-.pos-item .nm{flex:1;font-size:14px}
-.pos-item .pr{font-family:var(--fm);font-size:14px;color:var(--t2)}
-.pos-item .del{color:var(--red);font-size:18px;width:24px;text-align:center}
-.pos-add{display:flex;gap:8px;margin-bottom:12px}
-.pos-add input{background:var(--s2);border:1px solid var(--b2);border-radius:10px;color:var(--t1);padding:11px}
-.pos-add .nm{flex:1}
-.pos-add .pr{width:88px}
-.pos-add button{background:var(--s3);border:1px solid var(--b2);color:var(--mint);border-radius:10px;width:46px;font-size:22px;font-weight:700}
-.pos-total{display:flex;justify-content:space-between;align-items:baseline;padding:4px 2px 14px}
-.pos-total .l{color:var(--t2);font-size:14px}
-.pos-total .v{font-family:var(--fd);font-size:30px;font-weight:800;color:var(--mint)}
-.codein{display:flex;gap:9px;justify-content:center;margin:4px 0 16px}
-.codein input{width:56px;height:64px;background:var(--s2);border:2px solid var(--b2);border-radius:13px;text-align:center;font-family:var(--fd);font-size:28px;font-weight:800;color:var(--mint);caret-color:var(--mint)}
-.codein input:focus{border-color:var(--mint);background:var(--mdim)}
-.field-inline label{display:block;font-size:11px;color:var(--t3);font-family:var(--fm);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;text-align:center}
-.pos-success{text-align:center;padding:20px 0}
-.pos-success .si{font-size:54px;margin-bottom:10px;animation:pop .4s cubic-bezier(.18,.89,.32,1.28)}
-@keyframes pop{0%{transform:scale(0)}80%{transform:scale(1.12)}100%{transform:scale(1)}}
-.pos-success .st{font-family:var(--fd);font-size:22px;font-weight:800;color:var(--mint)}
-.pos-success .ss{color:var(--t2);font-size:14px;margin-top:6px}
+.steps{margin-top:44px;display:grid;gap:0}
+.step{display:grid;grid-template-columns:62px 1fr;gap:20px;padding:26px 0;border-top:1px dashed var(--line)}
+.step:last-child{border-bottom:1px dashed var(--line)}
+.step .n{font-family:var(--f-slip);font-size:15px;color:var(--mint);padding-top:3px}
+.step h3{font-family:var(--f-display);font-weight:700;font-size:21px;letter-spacing:-.01em;margin-bottom:6px}
+.step p{color:var(--muted);font-size:16px;max-width:60ch}
 
-/* profile */
-.pf-ava{width:80px;height:80px;border-radius:50%;background:var(--mint);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:800;font-size:30px;color:var(--bg);margin:6px auto 12px}
-.pf-name{text-align:center;font-family:var(--fd);font-size:20px;font-weight:800}
-.pf-email{text-align:center;color:var(--t3);font-size:13px;margin-bottom:18px}
-.pf-row{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--b1)}
-.pf-row:last-child{border:none}
-.pf-ic{width:36px;height:36px;border-radius:10px;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:16px}
-.pf-row .nm{flex:1;font-size:14px}
-.pf-row .vl{font-family:var(--fm);color:var(--mint);font-size:15px}
-.btn-out{width:100%;background:transparent;border:1px solid var(--b2);color:var(--red);border-radius:12px;padding:14px;font-weight:600;margin-top:18px}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start}
+.plain{list-style:none;margin-top:26px;display:grid;gap:16px}
+.plain li{padding-left:26px;position:relative;color:var(--muted)}
+.plain li::before{content:'';position:absolute;left:0;top:11px;width:11px;height:2px;background:var(--mint)}
+.plain b{color:var(--text);font-weight:500}
 
-/* bottom nav */
-.nav{position:absolute;bottom:0;left:0;right:0;background:var(--s1);border-top:1px solid var(--b1);display:flex;padding:8px 0 max(8px,env(safe-area-inset-bottom))}
-.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px;color:var(--t3);background:none}
-.nav-btn.on{color:var(--mint)}
-.nav-btn svg{width:23px;height:23px}
-.nav-btn span{font-size:10px;font-weight:600}
+.pilot{background:var(--ink-2);border:1px solid var(--line);border-radius:16px;padding:34px}
+.pilot h3{font-family:var(--f-display);font-weight:700;font-size:22px;margin-bottom:12px}
+.pilot p{color:var(--muted);font-size:16px}
+.pilot p + p{margin-top:12px}
 
-/* toast */
-.toast{position:fixed;left:50%;transform:translateX(-50%) translateY(120px);bottom:96px;width:92%;max-width:420px;background:var(--s1);border:1px solid var(--mglow);border-radius:14px;padding:13px 16px;z-index:99;transition:transform .35s cubic-bezier(.18,.89,.32,1.28);box-shadow:0 20px 50px rgba(0,0,0,.6)}
-.toast.show{transform:translateX(-50%) translateY(0)}
-.toast .th{display:flex;align-items:center;gap:7px;margin-bottom:6px}
-.toast .dot{width:7px;height:7px;background:var(--mint);border-radius:50%;animation:bl 1s infinite}
-@keyframes bl{0%,100%{opacity:1}50%{opacity:.3}}
-.toast .tt{font-family:var(--fd);font-size:12px;font-weight:700;color:var(--mint)}
-.toast .ts{font-weight:600;font-size:15px}
-.toast .ta{font-family:var(--fd);font-weight:800;font-size:19px}
-.toast .ti{font-size:12px;color:var(--t3);margin-top:2px}
+section.close{text-align:center;padding:100px 24px}
+.close h2{max-width:20ch;margin:0 auto}
+.close .sec-lede{margin:16px auto 0}
+.close .btn{margin-top:30px}
 
-/* loading */
-.loader{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
-.spin{width:36px;height:36px;border:3px solid var(--b1);border-top-color:var(--mint);border-radius:50%;animation:sp 0.7s linear infinite}
-@keyframes sp{to{transform:rotate(360deg)}}
-.config-note{background:rgba(255,184,48,.1);border:1px solid rgba(255,184,48,.3);color:var(--amber);border-radius:10px;padding:11px;font-size:12px;margin-bottom:14px}
+footer{border-top:1px solid var(--line);padding:34px 0 46px;color:var(--muted);font-size:14px}
+.foot{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+.foot a{text-decoration:none}
+.foot a:hover{color:var(--text)}
+
+@media (max-width:860px){
+  .hero-grid{grid-template-columns:1fr;gap:44px}
+  .reasons{grid-template-columns:1fr;gap:30px}
+  .split{grid-template-columns:1fr;gap:40px}
+  .hero{padding:48px 24px 40px}
+  section.wrap{padding:56px 24px}
+  section.close{padding:72px 24px}
+  .nav a.quiet{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  html{scroll-behavior:auto}
+}
 </style>
 </head>
 <body>
-<div id="app">
-  <div class="loader" id="boot"><div class="spin"></div><div style="color:var(--t3);font-size:13px">Connecting…</div></div>
-</div>
 
-<div class="toast" id="toast">
-  <div class="th"><div class="dot"></div><div class="tt">Receipt received</div></div>
-  <div class="ts" id="toast-store"></div>
-  <div class="ta" id="toast-amt"></div>
-  <div class="ti" id="toast-items"></div>
-</div>
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="#top">
+      <svg width="27" height="27" viewBox="0 0 512 512" aria-hidden="true">
+        <defs><linearGradient id="d" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#19F5B0"/><stop offset="1" stop-color="#00B377"/></linearGradient></defs>
+        <path d="M256 110C188 212 150 262 150 330a106 106 0 0 0 212 0c0-68-38-118-106-220Z" fill="url(#d)"/>
+        <circle cx="256" cy="320" r="34" fill="#0A0C10"/>
+      </svg>
+      Zero Ink
+    </a>
+    <div class="nav-sp"></div>
+    <a class="quiet" href="#restaurants">For restaurants</a>
+    <a class="quiet" href="#how">How it works</a>
+    <a class="btn btn-solid" href="./app/">Open the app</a>
+  </div>
+</header>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.min.js"></script>
-<script>
-/* ============================================================
-   ZERO INK — live web app, wired to your Supabase backend.
-   To point at a different project, change these two lines:
-   ============================================================ */
-const SUPABASE_URL = 'https://rzimhuqebjwzjzqttfry.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_veMbMrKAQaSmsGGL6GiyDA_pxNzOrn8';
+<main id="top">
 
-/* resilient storage (works in private tabs / sandboxes) */
-const mem = {};
-const store = {
-  getItem:k=>{try{return localStorage.getItem(k)}catch{return mem[k]??null}},
-  setItem:(k,v)=>{try{localStorage.setItem(k,v)}catch{mem[k]=v}},
-  removeItem:k=>{try{localStorage.removeItem(k)}catch{delete mem[k]}}
-};
-
-let sb, profile=null, receipts=[], rtChannel=null, authMode='signin', signupRole='customer';
-const DROP = '<svg class="logo-drop" width="44" height="44" viewBox="0 0 512 512"><defs><linearGradient id="dg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#19f5b0"/><stop offset="1" stop-color="#00b377"/></linearGradient></defs><path d="M256 110 C188 212 150 262 150 330 a106 106 0 0 0 212 0 C362 262 324 212 256 110 Z" fill="url(#dg)"/><circle cx="256" cy="320" r="34" fill="#07090d"/></svg>';
-
-const $ = id => document.getElementById(id);
-const app = $('app');
-
-function iconFor(name){
-  const n=(name||'').toLowerCase();
-  if(/coffee|cafe|brew|espresso|latte/.test(n))return'☕';
-  if(/burger|grill|diner|kitchen|eat|food|restaurant|bistro|pizza|taco|sushi|bar/.test(n))return'🍽️';
-  if(/market|grocery|mart|store|shop/.test(n))return'🛒';
-  if(/gas|fuel|shell|petrol/.test(n))return'⛽';
-  if(/pharma|drug|health|clinic/.test(n))return'💊';
-  return'🧾';
-}
-function money(n){return '$'+Number(n||0).toFixed(2)}
-function gen4(){return String(Math.floor(1000+Math.random()*9000))}
-
-/* ---------- boot ---------- */
-(async function boot(){
-  try{
-    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-      auth:{ storage:store, persistSession:true, autoRefreshToken:true, detectSessionInUrl:false }
-    });
-    const { data:{ session } } = await sb.auth.getSession();
-    if(session){ await loadProfile(session.user); renderApp(); }
-    else renderAuth();
-  }catch(e){
-    app.innerHTML = '<div class="loader"><div style="font-size:40px">⚠️</div><div style="color:var(--t2);text-align:center;padding:0 30px">Couldn\'t reach the backend.<br><span style="font-size:12px;color:var(--t3)">'+String(e.message||e)+'</span></div></div>';
-  }
-})();
-
-async function loadProfile(user){
-  let { data } = await sb.from('profiles').select('*').eq('id', user.id).maybeSingle();
-  if(!data){
-    // create a profile with a unique code
-    let code, ok=false;
-    for(let i=0;i<6 && !ok;i++){
-      code = gen4();
-      const ins = await sb.from('profiles').insert({ id:user.id, full_name:(user.user_metadata?.full_name)||'Member', code, is_merchant:false }).select().maybeSingle();
-      if(ins.data){ data=ins.data; ok=true; }
-    }
-    if(!data) data = { id:user.id, full_name:'Member', code:'----' };
-  }
-  data.email = user.email;
-  profile = data;
-}
-
-/* ============================================================
-   AUTH SCREEN
-   ============================================================ */
-function renderAuth(){
-  const signup = authMode==='signup';
-  app.innerHTML = `
-  <div class="auth-wrap">
-    <div class="auth-logo">${DROP}</div>
-    <div class="auth-title">Zero Ink</div>
-    <div class="auth-sub">Receipts, reimagined.</div>
-    <div class="auth-err" id="aerr"></div>
-    ${signup?`
-    <div class="auth-role">
-      <div class="role-opt ${signupRole==='customer'?'on':''}" onclick="setRole('customer')"><span class="ri">🙋</span>I'm a shopper</div>
-      <div class="role-opt ${signupRole==='merchant'?'on':''}" onclick="setRole('merchant')"><span class="ri">🏪</span>I'm a business</div>
-    </div>
-    <div class="field"><label>Full name</label><input id="f-name" placeholder="${signupRole==='merchant'?'Business name':'Your name'}" autocomplete="name"></div>`:''}
-    <div class="field"><label>Email</label><input id="f-email" type="email" placeholder="you@email.com" autocomplete="email" autocapitalize="off"></div>
-    <div class="field"><label>Password</label><input id="f-pass" type="password" placeholder="At least 6 characters" autocomplete="${signup?'new-password':'current-password'}"></div>
-    <button class="btn-primary" id="f-go" onclick="doAuth()">${signup?'Create account':'Sign in'}</button>
-    <div class="auth-switch" onclick="toggleMode()">${signup?'Already have an account? Sign in':"New here? Create an account"}</div>
-  </div>`;
-}
-window.setRole = r => { signupRole=r; renderAuth(); };
-window.toggleMode = () => { authMode = authMode==='signup'?'signin':'signup'; renderAuth(); };
-function authErr(m){ const e=$('aerr'); if(e){ e.textContent=m; e.classList.add('show'); } }
-
-window.doAuth = async function(){
-  const btn=$('f-go'); const email=$('f-email').value.trim(); const pass=$('f-pass').value;
-  if(!email||!pass){ authErr('Enter your email and password.'); return; }
-  btn.disabled=true; btn.textContent='Please wait…';
-  try{
-    if(authMode==='signup'){
-      const name=($('f-name')?.value||'').trim()||'Member';
-      const { data, error } = await sb.auth.signUp({ email, password:pass, options:{ data:{ full_name:name, is_merchant:signupRole==='merchant' } } });
-      if(error) throw error;
-      let user = data.user, session = data.session;
-      if(!session){ // email confirm likely off but no session returned — sign in
-        const si = await sb.auth.signInWithPassword({ email, password:pass });
-        if(si.error) throw new Error('Account created. Please sign in.');
-        user = si.data.user; session = si.data.session;
-      }
-      await loadProfile(user);
-      if(signupRole==='merchant' && profile){ await sb.from('profiles').update({ is_merchant:true }).eq('id',profile.id); profile.is_merchant=true; }
-      renderApp();
-    } else {
-      const { data, error } = await sb.auth.signInWithPassword({ email, password:pass });
-      if(error) throw error;
-      await loadProfile(data.user);
-      renderApp();
-    }
-  }catch(e){
-    authErr(friendly(e.message||String(e)));
-    btn.disabled=false; btn.textContent = authMode==='signup'?'Create account':'Sign in';
-  }
-};
-function friendly(m){
-  if(/already registered|already exists/i.test(m)) return 'That email already has an account. Try signing in.';
-  if(/invalid login|invalid credentials/i.test(m)) return 'Wrong email or password.';
-  if(/password should be at least/i.test(m)) return 'Password must be at least 6 characters.';
-  return m;
-}
-
-/* ============================================================
-   MAIN APP SHELL
-   ============================================================ */
-let currentTab = 'home';
-function renderApp(){
-  currentTab = profile?.is_merchant ? 'merchant' : 'home';
-  app.innerHTML = `
-    <div id="view" class="view"></div>
-    <div class="nav" id="nav"></div>`;
-  buildNav();
-  openTab(currentTab);
-  subscribeRealtime();
-}
-
-function buildNav(){
-  const tabs = [
-    {id:'home', label:'Home', svg:'<path d="M3 11l9-8 9 8M5 10v10a1 1 0 001 1h4v-6h4v6h4a1 1 0 001-1V10"/>'},
-    {id:'merchant', label:'Send', svg:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M8 15h3"/>'},
-    {id:'profile', label:'Profile', svg:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>'},
-  ];
-  $('nav').innerHTML = tabs.map(t=>`
-    <button class="nav-btn ${t.id===currentTab?'on':''}" onclick="openTab('${t.id}')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${t.svg}</svg>
-      <span>${t.label}</span>
-    </button>`).join('');
-}
-window.openTab = function(id){
-  currentTab=id;
-  document.querySelectorAll('.nav-btn').forEach((b,i)=>b.classList.toggle('on',['home','merchant','profile'][i]===id));
-  if(id==='home') renderHome();
-  else if(id==='merchant') renderMerchant();
-  else renderProfile();
-};
-
-/* ---------- HOME (customer) ---------- */
-async function renderHome(){
-  const v=$('view');
-  v.innerHTML = `
-    <div class="top"><div class="top-title">Hi, ${(profile.full_name||'there').split(' ')[0]} 👋</div></div>
-    <div class="codebig">
-      <div class="k">Your Zero Ink code</div>
-      <div class="c">${(profile.code||'----').split('').join(' ')}</div>
-      <div class="h">Give this at checkout to get your receipt</div>
-    </div>
-    <div class="stat-row">
-      <div class="stat"><div class="v" id="s-total">$0.00</div><div class="l">This month</div></div>
-      <div class="stat"><div class="v" id="s-count">0</div><div class="l">Receipts</div></div>
-    </div>
-    <div class="card">
-      <div class="card-t">Recent receipts</div>
-      <div id="rx-list"><div class="empty"><div class="ei">🧾</div><div class="et">Loading…</div></div></div>
-    </div>`;
-  await loadReceipts();
-}
-async function loadReceipts(){
-  const { data } = await sb.from('receipts').select('*').eq('customer_id', profile.id).order('created_at',{ascending:false});
-  receipts = data||[];
-  paintReceipts();
-}
-function paintReceipts(){
-  const list=$('rx-list'); if(!list) return;
-  const now=new Date(), month=now.getMonth(), year=now.getFullYear();
-  const total=receipts.filter(r=>{const d=new Date(r.created_at);return d.getMonth()===month&&d.getFullYear()===year;}).reduce((s,r)=>s+Number(r.amount||0),0);
-  if($('s-total')) $('s-total').textContent=money(total);
-  if($('s-count')) $('s-count').textContent=receipts.length;
-  if(!receipts.length){
-    list.innerHTML=`<div class="empty"><div class="ei">🧾</div><div class="et">No receipts yet</div><div style="font-size:13px">Share code <b style="color:var(--mint)">${profile.code}</b> at a store.<br>Receipts show up here instantly.</div></div>`;
-    return;
-  }
-  list.innerHTML = receipts.map(r=>`
-    <div class="rrow">
-      <div class="ricon">${iconFor(r.merchant_name)}</div>
-      <div class="rinfo"><div class="rname">${esc(r.merchant_name)}</div><div class="rmeta">${esc(r.items||'')} · ${timeAgo(r.created_at)}</div></div>
-      <div class="ramt">${money(r.amount)}</div>
-    </div>`).join('');
-}
-
-/* ---------- MERCHANT (send) ---------- */
-let posItems=[];
-function renderMerchant(){
-  const storeName = store.getItem('zi_store') || (profile.is_merchant? (profile.full_name||'') : '');
-  const v=$('view');
-  v.innerHTML = `
-    <div class="top"><div class="top-title">Send a receipt</div></div>
-    <div class="card">
-      <div class="field" style="margin-bottom:14px"><label>Store name</label><input id="m-store" placeholder="e.g. Blue Stone Coffee" value="${esc(storeName)}" oninput="saveStore(this.value)"></div>
-      <div class="pos-items" id="m-items"></div>
-      <div class="pos-add">
-        <input class="nm" id="m-iname" placeholder="Item">
-        <input class="pr" id="m-iprice" placeholder="0.00" inputmode="decimal">
-        <button onclick="addItem()">+</button>
+  <div class="wrap hero">
+    <div class="hero-grid">
+      <div>
+        <h1>No more paper.<br>Just four digits.</h1>
+        <p class="lede">Your customer reads you a four-digit code at checkout. Their itemised receipt is on their phone before they've put their wallet away.</p>
+        <div class="hero-cta">
+          <a class="btn btn-solid btn-lg" href="./app/">Try it free</a>
+          <a class="btn btn-ghost btn-lg" href="#restaurants">I run a restaurant</a>
+        </div>
+        <p class="hero-note">Works in any browser. Nothing to install, on your side or theirs.</p>
       </div>
-      <div class="pos-total"><span class="l">Total</span><span class="v" id="m-total">$0.00</span></div>
-      <div class="field-inline"><label>Customer's 4-digit code</label>
-        <div class="codein">
-          <input id="c0" maxlength="1" inputmode="numeric" oninput="codeHop(0)">
-          <input id="c1" maxlength="1" inputmode="numeric" oninput="codeHop(1)">
-          <input id="c2" maxlength="1" inputmode="numeric" oninput="codeHop(2)">
-          <input id="c3" maxlength="1" inputmode="numeric" oninput="codeHop(3)">
+
+      <div class="stage">
+        <div class="keypad">
+          <div class="keypad-label">CUSTOMER CODE</div>
+          <div class="digits" id="digits">
+            <div class="digit" data-d="7"></div>
+            <div class="digit" data-d="4"></div>
+            <div class="digit" data-d="2"></div>
+            <div class="digit" data-d="9"></div>
+          </div>
+        </div>
+
+        <div class="slip-hold">
+          <article class="slip" id="slip" hidden>
+            <h4>NAAN AND DOSA</h4>
+            <div class="sub">Table 4 · 12 Oct 2026</div>
+            <div class="rule"></div>
+            <div class="li"><span>Masala dosa</span><span>12.00</span></div>
+            <div class="li"><span>Mutton biriyani</span><span>18.00</span></div>
+            <div class="li"><span>Mango lassi</span><span>5.00</span></div>
+            <div class="rule"></div>
+            <div class="tot"><span>Total</span><span>$35.00</span></div>
+            <div class="stamp">sent to code 7429 · no paper used</div>
+          </article>
+        </div>
+
+        <button class="replay" id="replay" type="button">Run it again</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap"><div class="perf"></div></div>
+
+  <section id="restaurants" class="wrap">
+    <h2>Built for the counter, not the boardroom</h2>
+    <p class="sec-lede">Zero Ink sits alongside whatever till you already use. It doesn't replace your system or your records — it just gets the customer their copy.</p>
+    <div class="reasons">
+      <div class="reason">
+        <div class="bar"></div>
+        <h3>No rolls to buy</h3>
+        <p>Thermal paper costs money, jams at the worst moment, and runs out mid-rush. Digital receipts cost you nothing per print.</p>
+      </div>
+      <div class="reason">
+        <div class="bar"></div>
+        <h3>Nothing to install</h3>
+        <p>Open a web page on the tablet or phone already behind your counter. No new hardware, no integration project, no IT visit.</p>
+      </div>
+      <div class="reason">
+        <div class="bar"></div>
+        <h3>Fewer return arguments</h3>
+        <p>Customers stop losing receipts, so refunds and exchanges stop turning into a debate about what they actually paid.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap"><div class="perf"></div></div>
+
+  <section id="how" class="wrap">
+    <h2>Three steps, once</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="n">01</div>
+        <div>
+          <h3>Your customer gets a code</h3>
+          <p>They sign up once and keep the same four digits forever — like a PIN they actually remember. Nothing to scan, no app to download.</p>
         </div>
       </div>
-      <button class="btn-primary" id="m-send" onclick="sendReceipt()">Send receipt →</button>
+      <div class="step">
+        <div class="n">02</div>
+        <div>
+          <h3>You type it at checkout</h3>
+          <p>Add the items, punch in their four digits, hit send. It takes about as long as tearing off a paper receipt.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">03</div>
+        <div>
+          <h3>It lands on their phone</h3>
+          <p>Itemised and timestamped, in under a second. They never gave you their email, and you never had to ask for it.</p>
+        </div>
+      </div>
     </div>
-    <div class="card" id="m-recent-wrap">
-      <div class="card-t">Recently sent</div>
-      <div id="m-recent"><div class="empty" style="padding:20px"><div style="font-size:13px;color:var(--t3)">Receipts you send will appear here.</div></div></div>
-    </div>`;
-  paintItems();
-  loadSent();
-}
-window.saveStore = v => store.setItem('zi_store', v);
-window.addItem = function(){
-  const nm=$('m-iname').value.trim(); const pr=parseFloat($('m-iprice').value);
-  if(!nm||isNaN(pr)){ return; }
-  posItems.push({name:nm, price:pr});
-  $('m-iname').value=''; $('m-iprice').value=''; $('m-iname').focus();
-  paintItems();
-};
-window.delItem = i => { posItems.splice(i,1); paintItems(); };
-function paintItems(){
-  const box=$('m-items'); if(!box) return;
-  if(!posItems.length){ box.innerHTML=`<div style="padding:14px 0;text-align:center;color:var(--t3);font-size:13px">Add items below</div>`; }
-  else box.innerHTML = posItems.map((it,i)=>`<div class="pos-item"><span class="nm">${esc(it.name)}</span><span class="pr">${money(it.price)}</span><span class="del" onclick="delItem(${i})">×</span></div>`).join('');
-  const total=posItems.reduce((s,i)=>s+i.price,0);
-  if($('m-total')) $('m-total').textContent=money(total);
-}
-window.codeHop = function(i){
-  const el=$('c'+i); el.value=el.value.replace(/\D/g,'');
-  if(el.value && i<3) $('c'+(i+1)).focus();
-};
-function readCode(){ return [0,1,2,3].map(i=>$('c'+i).value).join(''); }
+  </section>
 
-window.sendReceipt = async function(){
-  const storeName=$('m-store').value.trim();
-  const code=readCode();
-  const total=posItems.reduce((s,i)=>s+i.price,0);
-  const btn=$('m-send');
-  if(!storeName){ shake('m-store'); return; }
-  if(code.length<4){ toast('Enter the customer\'s 4-digit code','',''); return; }
-  if(!posItems.length){ toast('Add at least one item','',''); return; }
-  btn.disabled=true; btn.textContent='Sending…';
-  try{
-    const { data:cust } = await sb.from('profiles').select('id').eq('code', code).maybeSingle();
-    if(!cust){ toast('No customer with code '+code,'','Double-check the code'); btn.disabled=false; btn.textContent='Send receipt →'; return; }
-    const items = posItems.map(i=>i.name).join(', ');
-    const { error } = await sb.from('receipts').insert({ customer_id:cust.id, merchant_name:storeName, items, amount:total, carbon:0 });
-    if(error) throw error;
-    // success
-    $('view').querySelector('.card').innerHTML = `
-      <div class="pos-success">
-        <div class="si">✅</div>
-        <div class="st">Receipt delivered!</div>
-        <div class="ss">${money(total)} sent to code <b style="color:var(--mint)">${code}</b>.<br>It's already on their phone.</div>
-        <button class="btn-primary" style="margin-top:18px" onclick="resetPos()">Send another</button>
-      </div>`;
-    posItems=[];
-    loadSent();
-  }catch(e){
-    toast('Could not send','', e.message||'Try again');
-    btn.disabled=false; btn.textContent='Send receipt →';
+  <div class="wrap"><div class="perf"></div></div>
+
+  <section class="wrap">
+    <div class="split">
+      <div>
+        <h2>For the person paying</h2>
+        <p class="sec-lede">Zero Ink is free for customers, and always will be.</p>
+        <ul class="plain">
+          <li><b>Every receipt in one place.</b> Searchable, not crumpled in a coat pocket.</li>
+          <li><b>Your email stays yours.</b> The shop only ever sees four digits — not your name, not your inbox.</li>
+          <li><b>Nothing to install.</b> Open the link, add it to your home screen if you like.</li>
+        </ul>
+      </div>
+      <div class="pilot">
+        <h3>Where this is today</h3>
+        <p>Zero Ink is in early pilot. It's working end to end — real codes, real receipts, delivered live — and it's free while we run it with our first restaurants.</p>
+        <p>If you run a place and want to try it, use it for a week and tell us what breaks. That feedback is the whole point right now.</p>
+        <p style="margin-top:18px"><a class="btn btn-ghost" href="mailto:hello@getzeroink.com">Email us</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap close">
+    <h2>Give your customers their receipt, not their rubbish.</h2>
+    <p class="sec-lede">Open the app and send one to yourself in about a minute.</p>
+    <a class="btn btn-solid btn-lg" href="./app/">Try it free</a>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <span>Zero Ink</span>
+    <span>·</span>
+    <a href="./app/">Open the app</a>
+    <span>·</span>
+    <a href="mailto:hello@getzeroink.com">hello@getzeroink.com</a>
+    <div class="nav-sp"></div>
+    <span>© 2026</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var digits = Array.prototype.slice.call(document.querySelectorAll('.digit'));
+  var slip = document.getElementById('slip');
+  var replay = document.getElementById('replay');
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var timers = [];
+
+  function clear(){ timers.forEach(clearTimeout); timers = []; }
+
+  function show(){
+    slip.hidden = false;
+    slip.classList.remove('printing');
+    void slip.offsetWidth;
+    if(!reduce) slip.classList.add('printing');
   }
-};
-window.resetPos = ()=>renderMerchant();
-async function loadSent(){
-  const storeName=store.getItem('zi_store'); if(!storeName) return;
-  const { data } = await sb.from('receipts').select('*').eq('merchant_name', storeName).order('created_at',{ascending:false}).limit(8);
-  const box=$('m-recent'); if(!box) return;
-  if(!data||!data.length){ return; }
-  box.innerHTML = data.map(r=>`<div class="rrow"><div class="ricon">${iconFor(r.merchant_name)}</div><div class="rinfo"><div class="rname">${esc(r.items||'Receipt')}</div><div class="rmeta">${timeAgo(r.created_at)}</div></div><div class="ramt">${money(r.amount)}</div></div>`).join('');
-}
 
-/* ---------- PROFILE ---------- */
-function renderProfile(){
-  const initials=(profile.full_name||'U').split(' ').map(s=>s[0]).join('').slice(0,2).toUpperCase();
-  $('view').innerHTML = `
-    <div class="top"><div class="top-title">Profile</div></div>
-    <div class="card">
-      <div class="pf-ava">${initials}</div>
-      <div class="pf-name">${esc(profile.full_name||'Member')}</div>
-      <div class="pf-email">${esc(profile.email||'')}</div>
-      <div class="pf-row"><div class="pf-ic">🔑</div><div class="nm">Your code</div><div class="vl">${profile.code}</div></div>
-      <div class="pf-row"><div class="pf-ic">${profile.is_merchant?'🏪':'🙋'}</div><div class="nm">Account type</div><div class="vl" style="color:var(--t2)">${profile.is_merchant?'Business':'Shopper'}</div></div>
-      <div class="pf-row"><div class="pf-ic">🧾</div><div class="nm">Total receipts</div><div class="vl" style="color:var(--t2)">${receipts.length}</div></div>
-      <button class="btn-out" onclick="signOut()">Sign out</button>
-    </div>
-    <div style="text-align:center;color:var(--t3);font-size:11px;margin-top:8px">Zero Ink · Pioneer Software Solutions</div>`;
-}
-window.signOut = async function(){ await sb.auth.signOut(); profile=null; receipts=[]; if(rtChannel){sb.removeChannel(rtChannel);rtChannel=null;} renderAuth(); };
+  function run(){
+    clear();
+    if(reduce){
+      digits.forEach(function(d){ d.textContent = d.dataset.d; d.classList.add('lit'); });
+      show();
+      return;
+    }
+    slip.hidden = true;
+    digits.forEach(function(d){ d.textContent=''; d.classList.remove('lit'); });
+    digits.forEach(function(d,i){
+      timers.push(setTimeout(function(){
+        d.textContent = d.dataset.d;
+        d.classList.add('lit');
+      }, 420 + i*260));
+    });
+    timers.push(setTimeout(show, 420 + digits.length*260 + 260));
+  }
 
-/* ---------- realtime ---------- */
-function subscribeRealtime(){
-  if(rtChannel) sb.removeChannel(rtChannel);
-  rtChannel = sb.channel('rx-'+profile.id)
-    .on('postgres_changes', { event:'INSERT', schema:'public', table:'receipts', filter:`customer_id=eq.${profile.id}` },
-      payload=>{
-        const r=payload.new;
-        receipts.unshift(r);
-        if(currentTab==='home') paintReceipts();
-        toast(r.merchant_name, money(r.amount), r.items||'');
-      })
-    .subscribe();
-}
+  replay.addEventListener('click', run);
 
-/* ---------- toast ---------- */
-let toastT;
-function toast(store_, amt, items){
-  $('toast-store').textContent=store_; $('toast-amt').textContent=amt; $('toast-items').textContent=items;
-  const t=$('toast'); t.classList.add('show'); clearTimeout(toastT);
-  toastT=setTimeout(()=>t.classList.remove('show'), 4200);
-}
-
-/* ---------- utils ---------- */
-function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
-function timeAgo(ts){
-  const d=new Date(ts), s=(Date.now()-d.getTime())/1000;
-  if(s<60)return'just now'; if(s<3600)return Math.floor(s/60)+'m ago';
-  if(s<86400)return Math.floor(s/3600)+'h ago';
-  if(s<604800)return Math.floor(s/86400)+'d ago';
-  return d.toLocaleDateString(undefined,{month:'short',day:'numeric'});
-}
-function shake(id){const e=$(id);if(!e)return;e.style.borderColor='var(--red)';setTimeout(()=>e.style.borderColor='',900);}
+  if('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){ if(e.isIntersecting){ run(); io.disconnect(); } });
+    }, {threshold:.4});
+    io.observe(document.querySelector('.stage'));
+  } else { run(); }
+})();
 </script>
 </body>
 </html>
