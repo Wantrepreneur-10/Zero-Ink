@@ -9,6 +9,11 @@
 <meta property="og:title" content="Zero Ink — digital receipts in four digits">
 <meta property="og:description" content="No paper. No printer. Your customer's receipt arrives on their phone before they've put their wallet away.">
 <meta property="og:type" content="website">
+<meta property="og:url" content="https://getzeroink.com/">
+<meta property="og:image" content="https://getzeroink.com/docs/banner.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://getzeroink.com/docs/banner.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='110' fill='%230A0C10'/%3E%3Cpath d='M256 110 C188 212 150 262 150 330 a106 106 0 0 0 212 0 C362 262 324 212 256 110 Z' fill='%2300e5a0'/%3E%3Ccircle cx='256' cy='320' r='34' fill='%230A0C10'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -22,7 +27,8 @@
   --mint:#00E5A0;
   --mint-deep:#00B377;
   --text:#EEF2F7;
-  --muted:#7E8899;
+  --muted:#8A94A6;
+  --violet:#9B8CFF;
   --f-display:'Syne',system-ui,sans-serif;
   --f-body:'DM Sans',system-ui,sans-serif;
   --f-slip:'DM Mono',ui-monospace,monospace;
@@ -64,10 +70,10 @@ header{position:sticky;top:0;z-index:50;background:rgba(10,12,16,.82);backdrop-f
 
 /* ---- hero ---- */
 .hero{padding:76px 24px 64px}
-.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center}
+.hero-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:48px;align-items:center}
 h1{
   font-family:var(--f-display);font-weight:800;
-  font-size:clamp(40px,5.6vw,66px);line-height:1.04;letter-spacing:-.03em;
+  font-size:clamp(36px,4.3vw,52px);line-height:1.04;letter-spacing:-.03em;
 }
 .lede{color:var(--muted);font-size:19px;margin-top:22px;max-width:46ch}
 .hero-cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
@@ -159,6 +165,70 @@ footer{border-top:1px solid var(--line);padding:34px 0 46px;color:var(--muted);f
 .foot a{text-decoration:none}
 .foot a:hover{color:var(--text)}
 
+
+/* ---- eyebrow + hero glow ---- */
+main{overflow-x:clip;position:relative;z-index:0}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:var(--f-slip);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mint);margin-bottom:18px}
+.eyebrow.v{color:var(--violet)}
+.eyebrow i{width:6px;height:6px;border-radius:50%;background:currentColor}
+.hero{position:relative}
+.hero::before{content:'';position:absolute;z-index:-1;width:720px;height:720px;left:-260px;top:-300px;border-radius:50%;background:radial-gradient(circle,rgba(0,229,160,.13),transparent 62%);pointer-events:none}
+h1 em{font-style:normal;color:var(--mint)}
+@media (min-width:1000px){h1{white-space:nowrap}}
+
+/* ---- product showcase ---- */
+.tabs{display:inline-flex;margin-top:30px;padding:4px;border:1px solid var(--line);border-radius:12px;background:var(--ink-2)}
+.tab{font-family:var(--f-display);font-weight:700;font-size:15px;color:var(--muted);background:none;border:none;padding:10px 18px;border-radius:9px;cursor:pointer}
+.tab[aria-selected="true"]{background:var(--mint);color:#04120C}
+.shots{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin-top:36px}
+.shots[hidden]{display:none}
+.shot{margin:0}
+.phone{border-radius:30px;padding:7px;background:#1A202C;box-shadow:0 0 0 1px #2A3346,0 26px 60px rgba(0,0,0,.5);transition:transform .25s}
+.shot:hover .phone{transform:translateY(-6px)}
+.phone img{display:block;width:100%;height:auto;border-radius:24px;aspect-ratio:390/844;object-fit:cover;object-position:top;background:#07090D}
+.shot figcaption{margin-top:16px}
+.shot b{display:block;font-family:var(--f-display);font-weight:700;font-size:17px;letter-spacing:-.01em}
+.shot span{display:block;color:var(--muted);font-size:14.5px;line-height:1.45;margin-top:4px}
+.shots-note{color:var(--muted);font-size:13px;margin-top:26px}
+
+/* ---- AI ---- */
+.ai-sec{position:relative}
+.ai-sec::before{content:'';position:absolute;z-index:-1;width:640px;height:640px;right:-240px;top:-80px;border-radius:50%;background:radial-gradient(circle,rgba(155,140,255,.12),transparent 62%);pointer-events:none}
+.ai-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:40px}
+.ai-card{background:linear-gradient(160deg,rgba(155,140,255,.08),var(--ink-2) 55%);border:1px solid rgba(155,140,255,.2);border-radius:16px;padding:26px}
+.ai-card .who{font-family:var(--f-slip);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--violet)}
+.ai-card h3{font-family:var(--f-display);font-weight:700;font-size:21px;letter-spacing:-.01em;margin:8px 0 8px}
+.ai-card p{color:var(--muted);font-size:16px}
+.say{margin-top:16px;font-family:var(--f-slip);font-size:13px;line-height:1.6;background:#0A0D12;border:1px solid var(--line);border-radius:10px;padding:12px 14px;color:var(--text)}
+.say s{text-decoration:none;color:var(--muted)}
+.say em{font-style:normal;color:var(--mint)}
+
+/* ---- compare ---- */
+.cmp{margin-top:40px;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.cmp-row{display:grid;grid-template-columns:1.1fr 1fr 1fr 1fr;border-top:1px solid var(--line)}
+.cmp-row:first-child{border-top:none;background:var(--ink-2);font-family:var(--f-display);font-weight:700}
+.cmp-row>div{padding:15px 18px;font-size:15.5px;color:var(--muted)}
+.cmp-row>div:first-child{color:var(--text)}
+.cmp-row>div:last-child{color:var(--text);background:rgba(0,229,160,.06)}
+.cmp-row:first-child>div:last-child{color:var(--mint)}
+
+/* ---- FAQ ---- */
+.faq{margin-top:36px;max-width:780px}
+.faq details{border-top:1px dashed var(--line);padding:4px 0}
+.faq details:last-child{border-bottom:1px dashed var(--line)}
+.faq summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:14px;padding:18px 0;font-family:var(--f-display);font-weight:700;font-size:18px;letter-spacing:-.01em}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:'+';margin-left:auto;font-family:var(--f-slip);font-size:22px;color:var(--mint);line-height:1}
+.faq details[open] summary::after{content:'–'}
+.faq p{color:var(--muted);font-size:16px;padding:0 0 20px;max-width:64ch}
+
+@media (max-width:860px){
+  .shots{grid-template-columns:repeat(2,1fr);gap:26px 16px}
+  .ai-grid{grid-template-columns:1fr}
+  .cmp-row{grid-template-columns:1fr 1fr}
+  .cmp-row>div:nth-child(2),.cmp-row>div:nth-child(3){display:none}
+}
+
 @media (max-width:860px){
   .hero-grid{grid-template-columns:1fr;gap:44px}
   .reasons{grid-template-columns:1fr;gap:30px}
@@ -187,8 +257,10 @@ footer{border-top:1px solid var(--line);padding:34px 0 46px;color:var(--muted);f
       Zero Ink
     </a>
     <div class="nav-sp"></div>
-    <a class="quiet" href="#restaurants">For restaurants</a>
+    <a class="quiet" href="#product">Product</a>
+    <a class="quiet" href="#ai">AI</a>
     <a class="quiet" href="#how">How it works</a>
+    <a class="quiet" href="#faq">FAQ</a>
     <a class="btn btn-solid" href="./app/">Open the app</a>
   </div>
 </header>
@@ -198,11 +270,12 @@ footer{border-top:1px solid var(--line);padding:34px 0 46px;color:var(--muted);f
   <div class="wrap hero">
     <div class="hero-grid">
       <div>
-        <h1>No more paper.<br>Just four digits.</h1>
+        <div class="eyebrow"><i></i>Digital receipts for restaurants</div>
+        <h1>No more paper.<br>Just <em>four digits.</em></h1>
         <p class="lede">Your customer reads you a four-digit code at checkout. Their itemised receipt is on their phone before they've put their wallet away.</p>
         <div class="hero-cta">
           <a class="btn btn-solid btn-lg" href="./app/">Try it free</a>
-          <a class="btn btn-ghost btn-lg" href="#restaurants">I run a restaurant</a>
+          <a class="btn btn-ghost btn-lg" href="#product">See the product</a>
         </div>
         <p class="hero-note">Works in any browser. Nothing to install, on your side or theirs.</p>
       </div>
@@ -221,7 +294,7 @@ footer{border-top:1px solid var(--line);padding:34px 0 46px;color:var(--muted);f
         <div class="slip-hold">
           <article class="slip" id="slip" hidden>
             <h4>NAAN AND DOSA</h4>
-            <div class="sub">Table 4 · 12 Oct 2026</div>
+            <div class="sub">Table 4 · 7:42 PM</div>
             <div class="rule"></div>
             <div class="li"><span>Masala dosa</span><span>12.00</span></div>
             <div class="li"><span>Mutton biriyani</span><span>18.00</span></div>
@@ -236,6 +309,76 @@ footer{border-top:1px solid var(--line);padding:34px 0 46px;color:var(--muted);f
       </div>
     </div>
   </div>
+
+  <div class="wrap"><div class="perf"></div></div>
+
+  <section id="product" class="wrap">
+    <div class="eyebrow"><i></i>The product</div>
+    <h2>One app. Two sides of the counter.</h2>
+    <p class="sec-lede">The restaurant gets a fast register and a live dashboard. The customer gets every receipt in one place. Both open in a browser.</p>
+
+    <div class="tabs" role="tablist" aria-label="Choose a side">
+      <button class="tab" role="tab" id="tab-biz" aria-controls="shots-biz" aria-selected="true">For restaurants</button>
+      <button class="tab" role="tab" id="tab-cust" aria-controls="shots-cust" aria-selected="false" tabindex="-1">For customers</button>
+    </div>
+
+    <div class="shots" id="shots-biz" role="tabpanel" aria-labelledby="tab-biz">
+      <figure class="shot"><div class="phone"><img src="docs/screenshots/register-smart.png" alt="Register screen with smart order entry and a tap-to-add menu" loading="lazy" width="390" height="844"></div>
+        <figcaption><b>Ring it up your way</b><span>Tap the menu, type the order, or just say it out loud.</span></figcaption></figure>
+      <figure class="shot"><div class="phone"><img src="docs/screenshots/register-send.png" alt="Order total with the customer's four-digit code entered and their name confirmed" loading="lazy" width="390" height="844"></div>
+        <figcaption><b>Four digits, then send</b><span>You see the customer's first name before it goes, so it never lands on the wrong phone.</span></figcaption></figure>
+      <figure class="shot"><div class="phone"><img src="docs/screenshots/dashboard.png" alt="Dashboard showing today's sales, receipts, average ticket and insights" loading="lazy" width="390" height="844"></div>
+        <figcaption><b>Know your day</b><span>Sales, average ticket, busiest hour and plain-English insights.</span></figcaption></figure>
+      <figure class="shot"><div class="phone"><img src="docs/screenshots/dashboard-items.png" alt="Top selling items and repeat customers" loading="lazy" width="390" height="844"></div>
+        <figcaption><b>Best sellers and regulars</b><span>See what's moving and who keeps coming back.</span></figcaption></figure>
+    </div>
+
+    <div class="shots" id="shots-cust" role="tabpanel" aria-labelledby="tab-cust" hidden>
+      <figure class="shot"><div class="phone"><img src="docs/screenshots/customer-home.png" alt="Customer home screen showing a four-digit code and recent receipts" loading="lazy" width="390" height="844"></div>
+        <figcaption><b>Your code, your receipts</b><span>One code for every shop. This month's spending at a glance.</span></figcaption></figure>
+      <figure class="shot"><div class="phone"><img src="docs/screenshots/customer-receipt.png" alt="An itemised digital receipt with subtotal, tax and total" loading="lazy" width="390" height="844"></div>
+        <figcaption><b>The full receipt</b><span>Every item, tax and total. There when you need it for a return or an expense claim.</span></figcaption></figure>
+      <figure class="shot"><div class="phone"><img src="docs/screenshots/customer-insights.png" alt="Ask your receipts screen answering a spending question" loading="lazy" width="390" height="844"></div>
+        <figcaption><b>Ask your receipts</b><span>"How much did I spend on food this month?" Get the answer in a sentence.</span></figcaption></figure>
+      <figure class="shot"><div class="phone"><img src="docs/screenshots/menu.png" alt="Menu editor with a scan a menu photo button" loading="lazy" width="390" height="844"></div>
+        <figcaption><b>Run a shop too?</b><span>Switch sides any time. Setting up a menu takes one photo.</span></figcaption></figure>
+    </div>
+    <p class="shots-note">Screens shown with sample data.</p>
+  </section>
+
+  <div class="wrap"><div class="perf"></div></div>
+
+  <section id="ai" class="wrap ai-sec">
+    <div class="eyebrow v"><i></i>Built-in AI</div>
+    <h2>AI that does the typing for you</h2>
+    <p class="sec-lede">Zero Ink uses AI where it saves real minutes at the counter, and nowhere else.</p>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="who">Restaurants</div>
+        <h3>Say the order</h3>
+        <p>Speak or type the order the way you'd say it to the kitchen. It matches your menu, fixes typos and fills in the prices.</p>
+        <div class="say"><s>you say</s> "two masala dosa, a mango lasi and garlic nan"<br><s>it adds</s> <em>2 × Masala Dosa · Mango Lassi · Garlic Naan</em></div>
+      </div>
+      <div class="ai-card">
+        <div class="who">Restaurants</div>
+        <h3>Snap your menu</h3>
+        <p>Take a photo of your printed menu. Every item and price is read into the register, ready to tap. No afternoon of data entry.</p>
+        <div class="say"><s>photo in</s> one menu page<br><s>register out</s> <em>items, prices and categories</em></div>
+      </div>
+      <div class="ai-card">
+        <div class="who">Restaurants</div>
+        <h3>Your day in three lines</h3>
+        <p>Open the dashboard and read what happened: where the money came from, what sold, and what to try tomorrow.</p>
+        <div class="say"><em>•</em> Dinner carried the day: 6–8 PM was over half of sales.<br><em>•</em> Masala Dosa is the top seller. Try a lassi combo.</div>
+      </div>
+      <div class="ai-card">
+        <div class="who">Customers</div>
+        <h3>Ask your receipts</h3>
+        <p>Skip the scrolling. Ask a question about your spending and get a straight answer from your own receipts.</p>
+        <div class="say"><s>you ask</s> "How much at Naan and Dosa this month?"<br><s>answer</s> <em>$31.39 across 1 visit.</em></div>
+      </div>
+    </div>
+  </section>
 
   <div class="wrap"><div class="perf"></div></div>
 
@@ -259,6 +402,15 @@ footer{border-top:1px solid var(--line);padding:34px 0 46px;color:var(--muted);f
         <p>Customers stop losing receipts, so refunds and exchanges stop turning into a debate about what they actually paid.</p>
       </div>
     </div>
+
+    <div class="cmp" role="table" aria-label="Paper, email and Zero Ink receipts compared">
+      <div class="cmp-row" role="row"><div role="columnheader"></div><div role="columnheader">Paper</div><div role="columnheader">Email receipt</div><div role="columnheader">Zero Ink</div></div>
+      <div class="cmp-row" role="row"><div role="cell">Customer shares</div><div role="cell">Nothing</div><div role="cell">Their email, out loud</div><div role="cell">Four digits</div></div>
+      <div class="cmp-row" role="row"><div role="cell">Arrives</div><div role="cell">In hand, then the bin</div><div role="cell">Later, maybe in spam</div><div role="cell">Instantly, in one place</div></div>
+      <div class="cmp-row" role="row"><div role="cell">You learn</div><div role="cell">Nothing</div><div role="cell">Nothing</div><div role="cell">Sales, top items, regulars</div></div>
+      <div class="cmp-row" role="row"><div role="cell">Cost per receipt</div><div role="cell">Paper and ink</div><div role="cell">Free</div><div role="cell">Free in the pilot</div></div>
+    </div>
+
   </section>
 
   <div class="wrap"><div class="perf"></div></div>
@@ -277,14 +429,14 @@ footer{border-top:1px solid var(--line);padding:34px 0 46px;color:var(--muted);f
         <div class="n">02</div>
         <div>
           <h3>You type it at checkout</h3>
-          <p>Add the items, punch in their four digits, hit send. It takes about as long as tearing off a paper receipt.</p>
+          <p>Tap or say the items, punch in their four digits, hit send. It takes about as long as tearing off a paper receipt.</p>
         </div>
       </div>
       <div class="step">
         <div class="n">03</div>
         <div>
           <h3>It lands on their phone</h3>
-          <p>Itemised and timestamped, in under a second. They never gave you their email, and you never had to ask for it.</p>
+          <p>Itemised and timestamped, in about a second. They never gave you their email, and you never had to ask for it.</p>
         </div>
       </div>
     </div>
@@ -299,7 +451,7 @@ footer{border-top:1px solid var(--line);padding:34px 0 46px;color:var(--muted);f
         <p class="sec-lede">Zero Ink is free for customers, and always will be.</p>
         <ul class="plain">
           <li><b>Every receipt in one place.</b> Searchable, not crumpled in a coat pocket.</li>
-          <li><b>Your email stays yours.</b> The shop only ever sees four digits — not your name, not your inbox.</li>
+          <li><b>Your email stays yours.</b> The shop sees four digits and your first name. Never your email or your inbox.</li>
           <li><b>Nothing to install.</b> Open the link, add it to your home screen if you like.</li>
         </ul>
       </div>
@@ -309,6 +461,21 @@ footer{border-top:1px solid var(--line);padding:34px 0 46px;color:var(--muted);f
         <p>If you run a place and want to try it, use it for a week and tell us what breaks. That feedback is the whole point right now.</p>
         <p style="margin-top:18px"><a class="btn btn-ghost" href="mailto:hello@getzeroink.com">Email us</a></p>
       </div>
+    </div>
+  </section>
+
+
+  <div class="wrap"><div class="perf"></div></div>
+
+  <section id="faq" class="wrap">
+    <h2>Questions restaurants ask</h2>
+    <div class="faq">
+      <details><summary>Do I need new hardware or a new till?</summary><p>No. Zero Ink runs in the browser on any phone, tablet or laptop you already have. It sits next to your current till and doesn't replace it.</p></details>
+      <details><summary>What does the customer have to do?</summary><p>Sign up once on their phone, which takes under a minute, and remember four digits. There's no app store download. They can add Zero Ink to their home screen if they want it one tap away.</p></details>
+      <details><summary>What if a customer doesn't have a code?</summary><p>Print them a paper receipt as usual. Zero Ink works alongside your printer, so nobody is left without one. A counter card with a QR code lets curious customers sign up while they wait.</p></details>
+      <details><summary>Does it take payments?</summary><p>No. Zero Ink only delivers the receipt. You keep taking payment exactly the way you do today.</p></details>
+      <details><summary>Who can see a receipt?</summary><p>Only the customer it was sent to and the business that sent it. The business never sees the customer's email, just their code and first name.</p></details>
+      <details><summary>What does it cost?</summary><p>Nothing during the pilot. We're working with our first restaurants and want your feedback more than your money.</p></details>
     </div>
   </section>
 
@@ -368,6 +535,23 @@ footer{border-top:1px solid var(--line);padding:34px 0 46px;color:var(--muted);f
   }
 
   replay.addEventListener('click', run);
+
+  // product tabs
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
+  function pick(t){
+    tabs.forEach(function(x){
+      var on = x === t;
+      x.setAttribute('aria-selected', on);
+      x.tabIndex = on ? 0 : -1;
+      document.getElementById(x.getAttribute('aria-controls')).hidden = !on;
+    });
+  }
+  tabs.forEach(function(t, i){
+    t.addEventListener('click', function(){ pick(t); });
+    t.addEventListener('keydown', function(e){
+      if(e.key === 'ArrowRight' || e.key === 'ArrowLeft'){ var n = tabs[(i + 1) % tabs.length]; pick(n); n.focus(); }
+    });
+  });
 
   if('IntersectionObserver' in window){
     var io = new IntersectionObserver(function(entries){
