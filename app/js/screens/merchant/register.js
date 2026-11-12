@@ -14,6 +14,11 @@ export async function loadMenu() {
 }
 
 export function cartTotals(cart = state.cart, taxRate = Number(state.profile?.tax_rate) || 0) {
+  // An order loaded from the POS keeps the POS's own totals so both systems agree to the cent.
+  if (state.posOrder && cart === state.cart) {
+    const o = state.posOrder;
+    return { sub: r2(o.subtotal ?? o.total), tax: r2(o.tax), total: r2(o.total) };
+  }
   const sub = r2(cart.reduce((s, i) => s + i.qty * i.price, 0));
   const tax = r2((sub * taxRate) / 100);
   return { sub, tax, total: r2(sub + tax) };
@@ -31,6 +36,8 @@ export async function renderRegister() {
 
   $('view').innerHTML = `
     <div class="top"><div class="top-title">${esc(state.profile.full_name || 'Register')}<div class="top-sub">New receipt</div></div>${aiChip()}</div>
+
+    <div id="posq"></div>
 
     <div class="card ai-card">
       <div class="card-t">${icons.spark} Smart order entry</div>
@@ -58,11 +65,78 @@ export async function renderRegister() {
       <div class="lbl" style="text-align:center;margin-top:10px">Customer's 4-digit code</div>
       <div class="codein">${[0, 1, 2, 3].map((i) => `<input id="c${i}" data-i="${i}" maxlength="1" inputmode="numeric" pattern="[0-9]*" data-input="codeInput" data-keydown="codeKey">`).join('')}</div>
       <div class="who" id="who"></div>
+      <div id="usual"></div>
       <button class="btn" id="send" data-action="sendReceipt">Send receipt</button>
     </div>
 
     <div class="card"><div class="card-t">Just sent</div><div id="sent"></div></div>`;
-  paintTiles(); paintCart(); loadSent();
+  paintTiles(); paintCart(); loadSent(); loadPosOrders();
+}
+
+/* ---------- orders arriving from the POS ---------- */
+async function loadPosOrders() {
+  const { data } = await sb.from('pos_orders').select('*').eq('merchant_id', state.profile.id).eq('status', 'pending')
+    .order('created_at', { ascending: false }).limit(20);
+  state.posOrders = data || [];
+  paintPosOrders();
+}
+
+function paintPosOrders() {
+  const box = $('posq'); if (!box) return;
+  const list = state.posOrders.filter((o) => o.id !== state.posOrder?.id);
+  box.innerHTML = list.length ? `<div class="card pos-card">
+    <div class="card-t"><span class="live"></span> From your POS<span class="sp"></span><span class="muted" style="font-size:12px;font-weight:500;font-family:var(--fb)">${list.length} waiting</span></div>
+    ${list.map((o) => `<div class="rrow tap" data-action="loadPosOrder" data-id="${o.id}">
+      <div class="rinfo"><div class="rname">${esc(o.items.map((i) => (i.qty > 1 ? i.qty + '× ' : '') + i.name).join(', '))}</div>
+      <div class="rmeta">${o.external_id ? '#' + esc(o.external_id) + ' · ' : ''}${timeAgo(o.created_at)}</div></div>
+      <div class="ramt">${money(o.total)}</div>
+      <button class="x-dismiss" data-action="dismissPosOrder" data-id="${o.id}" aria-label="Dismiss">×</button></div>`).join('')}
+    <div class="hint">Tap an order, type the customer's code, send. No retyping.</div></div>` : '';
+}
+
+/** Called by the realtime subscription when the POS pushes a new order. */
+export function onPosOrder(o) {
+  if (o.status !== 'pending' || state.posOrders.some((x) => x.id === o.id)) return;
+  state.posOrders.unshift(o);
+  if (state.tab === 'register') paintPosOrders();
+  toast('New order from POS', o.items.map((i) => i.name).join(', '), money(o.total), 'Tap it in the Register to send the receipt');
+}
+
+function loadPosOrder(el, e) {
+  if (e.target.closest('[data-action="dismissPosOrder"]')) return;
+  const o = state.posOrders.find((x) => x.id === el.dataset.id); if (!o) return;
+  state.posOrder = o;
+  state.cart = o.items.map((i) => ({ name: i.name, price: r2(i.price), qty: i.qty || 1 }));
+  paintPosOrders(); paintCart(); paintTiles();
+  $('c0')?.focus();
+  $('lines').closest('.card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+async function dismissPosOrder(el) {
+  const id = el.dataset.id;
+  await sb.from('pos_orders').update({ status: 'dismissed' }).eq('id', id);
+  state.posOrders = state.posOrders.filter((x) => x.id !== id);
+  paintPosOrders();
+}
+
+function unloadPosOrder() { state.posOrder = null; state.cart = []; paintPosOrders(); paintCart(); paintTiles(); }
+
+/* ---------- "the usual": what this customer normally orders here ---------- */
+async function showUsual(customer) {
+  const box = $('usual'); if (!box) return;
+  box.innerHTML = '';
+  if (state.cart.length) return;                       // only offer it on an empty order
+  const { data } = await sb.from('receipts').select('line_items').eq('merchant_id', state.profile.id)
+    .eq('customer_id', customer.id).order('created_at', { ascending: false }).limit(12);
+  const visits = (data || []).filter((r) => Array.isArray(r.line_items) && r.line_items.length);
+  if (visits.length < 2) return;
+  const seen = {};
+  visits.forEach((r) => new Set(r.line_items.map((i) => i.name)).forEach((n) => { seen[n] = (seen[n] || 0) + 1; }));
+  const names = Object.entries(seen).filter(([, n]) => n >= Math.max(2, visits.length / 2)).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([n]) => n);
+  const items = names.map((n) => state.menu.find((m) => m.active && m.name === n)).filter(Boolean);
+  if (!items.length || !box.isConnected) return;
+  state.usual = items;
+  box.innerHTML = `<button class="usual" data-action="addUsual">${icons.spark}<span><b>${esc(customer.first_name || 'Their')}'s usual</b><br>${items.map((i) => esc(i.name)).join(' · ')}</span><em>Add</em></button>`;
 }
 
 function paintTiles() {
@@ -77,6 +151,13 @@ function paintTiles() {
 function paintCart() {
   const l = $('lines'); if (!l) return;
   const cart = state.cart;
+  if (state.posOrder) {
+    l.innerHTML = `<div class="posnote"><span class="live"></span> From POS${state.posOrder.external_id ? ' · #' + esc(state.posOrder.external_id) : ''}<button data-action="unloadPosOrder">Clear</button></div>`
+      + cart.map((c) => `<div class="line"><span class="nm">${c.qty > 1 ? c.qty + ' × ' : ''}${esc(c.name)}</span><span class="pr">${money(c.qty * c.price)}</span></div>`).join('');
+    const t = cartTotals();
+    $('totals').innerHTML = `<div class="r"><span>Subtotal</span><span>${money(t.sub)}</span></div><div class="r"><span>Tax</span><span>${money(t.tax)}</span></div><div class="r grand"><span>Total</span><b>${money(t.total)}</b></div>`;
+    return;
+  }
   l.innerHTML = cart.length
     ? cart.map((c, i) => `<div class="line"><span class="nm">${esc(c.name)}</span><span class="qty"><button data-action="changeQty" data-i="${i}" data-d="-1">−</button><span>${c.qty}</span><button data-action="changeQty" data-i="${i}" data-d="1">+</button></span><span class="pr">${money(c.qty * c.price)}</span></div>`).join('')
     : '<div class="muted" style="text-align:center;font-size:13px;padding:10px 0">No items yet</div>';
@@ -85,6 +166,7 @@ function paintCart() {
 }
 
 function addLine(name, price, qty = 1) {
+  if (state.posOrder) return toast('Heads up', 'This order came from your POS', '', 'Tap Clear to start a different one');
   price = r2(price);
   const existing = state.cart.find((c) => c.name.toLowerCase() === name.toLowerCase() && c.price === price);
   if (existing) existing.qty += qty; else state.cart.push({ name, price, qty });
@@ -129,10 +211,12 @@ async function codeInput(el) {
   if (el.value && i < 3) $('c' + (i + 1)).focus();
   const code = readCode();
   $('who').innerHTML = '';
+  if ($('usual')) $('usual').innerHTML = '';
   if (code.length === 4) {
     const { data } = await sb.rpc('find_customer_by_code', { p_code: code });
     if (readCode() !== code) return;   // digits changed while we were looking up
     $('who').innerHTML = data?.length ? `Sending to <b>${esc(data[0].first_name || 'customer')}</b>` : `<span style="color:var(--red)">No customer with code ${code}</span>`;
+    if (data?.length) showUsual(data[0]);
   }
 }
 
@@ -154,11 +238,17 @@ async function sendReceipt(btn) {
       customer_code: code, carbon: 0,
     });
     if (error) throw error;
+    if (state.posOrder) {
+      const id = state.posOrder.id;
+      await sb.from('pos_orders').update({ status: 'sent' }).eq('id', id);
+      state.posOrders = state.posOrders.filter((x) => x.id !== id);
+      state.posOrder = null;
+    }
     btn.closest('.card').innerHTML = `<div class="ok"><div class="si">✅</div><div class="st">Receipt delivered</div>
       <div class="ss">${money(t.total)} sent to <b style="color:var(--mint)">${esc(customer.first_name || code)}</b> (${code}).<br>It's on their phone now. No paper printed.</div>
       <button class="btn" style="margin-top:18px" data-action="nextCustomer">Next customer</button></div>`;
     state.cart = [];
-    loadSent();
+    loadSent(); paintPosOrders();
   } catch (e) {
     toast('Error', 'Could not send', '', e.message || 'Try again');
     btn.disabled = false; btn.textContent = 'Send receipt';
@@ -174,12 +264,13 @@ async function loadSent() {
 }
 
 registerActions({
-  smartAdd, listen, codeInput, sendReceipt,
+  smartAdd, listen, codeInput, sendReceipt, loadPosOrder, dismissPosOrder, unloadPosOrder,
+  addUsual: () => { (state.usual || []).forEach((m) => addLine(m.name, Number(m.price))); $('usual').innerHTML = ''; },
   pickCategory: (el) => { state.menuCat = el.dataset.c; el.parentNode.querySelectorAll('.chip').forEach((x) => x.classList.toggle('on', x === el)); paintTiles(); },
   addMenuItem: (el) => { const m = state.menu.find((x) => x.id === el.dataset.id); if (m) addLine(m.name, Number(m.price)); },
   addCustom: () => { const n = $('cname').value.trim(), pr = parseFloat($('cprice').value); if (!n || isNaN(pr)) return; addLine(n, pr); $('cname').value = ''; $('cprice').value = ''; },
   changeQty: (el) => { const i = +el.dataset.i; state.cart[i].qty += +el.dataset.d; if (state.cart[i].qty <= 0) state.cart.splice(i, 1); paintCart(); paintTiles(); },
   codeKey: (el, e) => { const i = +el.dataset.i; if (e.key === 'Backspace' && !el.value && i > 0) $('c' + (i - 1)).focus(); },
-  nextCustomer: () => { state.cart = []; renderRegister(); },
+  nextCustomer: () => { state.cart = []; state.posOrder = null; renderRegister(); },
   goMenu: () => openTab('menu'),
 });

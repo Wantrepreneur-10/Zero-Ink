@@ -7,7 +7,7 @@ import { checkAI } from './lib/ai.js';
 import { renderAuth } from './auth.js';
 import { renderHome, paintHome } from './screens/customer/home.js';
 import { renderInsights } from './screens/customer/insights.js';
-import { renderRegister } from './screens/merchant/register.js';
+import { renderRegister, onPosOrder } from './screens/merchant/register.js';
 import { renderDashboard } from './screens/merchant/dashboard.js';
 import { renderMenu } from './screens/merchant/menu.js';
 import { renderSettings } from './screens/settings.js';
@@ -36,6 +36,14 @@ export async function start() {
   $('app').innerHTML = `<div id="view" class="view"></div><div class="nav" id="nav">${tabs.map(([id, label]) => `
     <button class="nav-btn" data-t="${id}" data-action="openTab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICONS[id]}</svg><span>${label}</span></button>`).join('')}</div>`;
   subscribe();
+  const sq = new URLSearchParams(location.search).get('square');
+  if (sq && state.profile.is_merchant) {
+    history.replaceState(null, '', location.pathname);
+    openTab('settings');
+    const msg = { connected: ['Square connected', 'Sales will now appear in your Register'], denied: ['Square not connected', 'You cancelled on Square\'s page'] }[sq] || ['Square not connected', 'Something went wrong. Try again.'];
+    toast(msg[0], msg[1]);
+    return;
+  }
   openTab(tabs[0][0]);
 }
 
@@ -49,7 +57,11 @@ export function openTab(id) {
 function subscribe() {
   if (state.channel) sb.removeChannel(state.channel);
   const me = state.profile.id;
-  state.channel = sb.channel('rx-' + me)
+  const ch = sb.channel('rx-' + me);
+  if (state.profile.is_merchant) {
+    ch.on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'pos_orders', filter: `merchant_id=eq.${me}` }, ({ new: o }) => onPosOrder(o));
+  }
+  state.channel = ch
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'receipts', filter: `customer_id=eq.${me}` }, ({ new: r }) => {
       if (state.receipts.some((x) => x.id === r.id)) return;
       state.receipts.unshift(r);

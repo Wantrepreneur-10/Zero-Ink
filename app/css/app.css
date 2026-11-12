@@ -205,3 +205,15 @@ textarea.inp{resize:none;min-height:52px;line-height:1.4}
 .spin{width:34px;height:34px;border:3px solid var(--b1);border-top-color:var(--mint);border-radius:50%;animation:sp .7s linear infinite}
 .spin.sm{width:16px;height:16px;border-width:2px;display:inline-block;vertical-align:middle}
 @keyframes sp{to{transform:rotate(360deg)}}
+
+/* ---- POS bridge ---- */
+.pos-card{border-color:var(--mglow);background:linear-gradient(160deg,rgba(0,229,160,.07),var(--s1) 60%)}
+.live{width:8px;height:8px;border-radius:50%;background:var(--mint);box-shadow:0 0 10px var(--mint);animation:bl 1.4s infinite;display:inline-block;flex-shrink:0}
+.x-dismiss{color:var(--t3);font-size:20px;width:30px;height:30px;flex-shrink:0}
+.posnote{display:flex;align-items:center;gap:8px;font-size:12px;font-family:var(--fm);color:var(--mint);background:var(--mdim);border:1px solid var(--mglow);border-radius:10px;padding:8px 10px;margin-bottom:6px}
+.posnote button{margin-left:auto;color:var(--t2);font-size:12px;text-decoration:underline;font-family:var(--fb)}
+.usual{width:100%;display:flex;align-items:center;gap:10px;text-align:left;background:var(--vdim);border:1px solid rgba(155,140,255,.3);border-radius:12px;padding:10px 12px;margin-bottom:10px;font-size:13px;color:var(--t2);line-height:1.4}
+.usual b{color:var(--t1);font-size:14px}
+.usual span{flex:1;min-width:0}
+.usual em{font-style:normal;font-family:var(--fd);font-weight:700;font-size:13px;color:#0b0a18;background:var(--violet);padding:7px 12px;border-radius:9px}
+.keybox{font-family:var(--fm);font-size:12px;line-height:1.5;background:var(--s2);border:1px solid var(--b2);border-radius:10px;padding:10px 12px;margin-bottom:10px;word-break:break-all;color:var(--t1);user-select:all}
